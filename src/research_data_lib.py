@@ -187,4 +187,195 @@ def rename_columns(
 
     return out
 
+# Complex 1 - Karl
+import re
+from datetime import datetime
 
+def validate_dataset(rows: list[dict], rules: dict) -> list[dict]:
+    """Validate a dataset (list of rows) against column rules.
+
+    Supported rule keys per column:
+      - required: bool                # column must exist and be non-null
+      - not_null: bool                # if present, value cannot be null
+      - type: 'int'|'float'|'bool'|'str'|'datetime:%Y-%m-%d'
+      - min: number                   # numeric lower bound (inclusive)
+      - max: number                   # numeric upper bound (inclusive)
+      - len_min: int                  # string length lower bound
+      - len_max: int                  # string length upper bound
+      - allowed: list|set             # allowed categorical values (after casting)
+      - regex: str                    # pattern the (string) value must match
+      - unique: bool                  # values must be unique across rows (non-null)
+
+    Returns:
+        List of issues: 
+        [{ 'row_idx': int, 'column': str, 'rule': str, 'value': any, 'message': str }, ...]
+
+    Notes:
+        - Uses cast_row_types() when a 'type' rule is provided to interpret values.
+        - Treats "", "na", "n/a", "null" (case-insensitive) as null.
+        - For uniqueness, nulls are ignored.
+    """
+    if not isinstance(rows, list) or not isinstance(rules, dict):
+        raise TypeError("validate_dataset: 'rows' must be list and 'rules' must be dict")
+
+    def is_null(x):
+        if x is None:
+            return True
+        if isinstance(x, str) and x.strip().lower() in ("", "na", "n/a", "null"):
+            return True
+        return False
+
+    # Prepare type map from rules for casting
+    type_map: dict[str, str] = {}
+    for col, spec in rules.items():
+        tlabel = spec.get("type")
+        if isinstance(tlabel, str):
+            type_map[col] = tlabel
+
+    issues: list[dict] = []
+
+    # First pass: optionally cast by type for validation (non-destructive)
+    casted_rows: list[dict] = []
+    if type_map:
+        try:
+            casted_rows = [cast_row_types(r, type_map) for r in rows]  # uses our medium func
+        except NameError:
+            # Fallback if cast_row_types isn't available yet
+            casted_rows = [dict(r) for r in rows]
+    else:
+        casted_rows = [dict(r) for r in rows]
+
+    # Track values for uniqueness checks
+    unique_track: dict[str, dict] = {}
+    for col, spec in rules.items():
+        if spec.get("unique"):
+            unique_track[col] = {"seen": {}, "dups": set()}  # value -> first_idx, plus dup idxs
+
+    # Row-wise validation
+    for idx, (raw_row, row) in enumerate(zip(rows, casted_rows)):
+        for col, spec in rules.items():
+            val_present = col in row
+            raw_present = col in raw_row
+            required = bool(spec.get("required", False))
+            not_null = bool(spec.get("not_null", False))
+            tlabel = spec.get("type")
+            v = row.get(col, None)
+
+            # required: must exist AND be non-null
+            if required and (not raw_present or is_null(raw_row.get(col))):
+                issues.append({
+                    "row_idx": idx,
+                    "column": col,
+                    "rule": "required",
+                    "value": raw_row.get(col) if raw_present else None,
+                    "message": "Required column missing or null."
+                })
+                # continue to next rule; still check others to surface more issues
+            # not_null: if provided, cannot be null
+            if raw_present and not_null and is_null(raw_row.get(col)):
+                issues.append({
+                    "row_idx": idx,
+                    "column": col,
+                    "rule": "not_null",
+                    "value": raw_row.get(col),
+                    "message": "Value cannot be null."
+                })
+
+            if not val_present:
+                continue  # nothing else to validate
+
+            # type check (post-cast)
+            if isinstance(tlabel, str):
+                ok = True
+                if tlabel == "int":
+                    ok = isinstance(v, int)
+                elif tlabel == "float":
+                    ok = isinstance(v, float) or isinstance(v, int)
+                elif tlabel == "bool":
+                    ok = isinstance(v, bool)
+                elif tlabel == "str":
+                    ok = (v is None) or isinstance(v, str)
+                elif tlabel.startswith("datetime:"):
+                    ok = isinstance(v, datetime)
+                else:
+                    ok = True  # unknown type label already flagged in cast_row_types
+                if not ok:
+                    issues.append({
+                        "row_idx": idx,
+                        "column": col,
+                        "rule": "type",
+                        "value": raw_row.get(col),
+                        "message": f"Expected {tlabel}."
+                    })
+
+            # numeric range checks
+            if isinstance(v, (int, float)):
+                if "min" in spec and v < spec["min"]:
+                    issues.append({
+                        "row_idx": idx, "column": col, "rule": "min", "value": v,
+                        "message": f"Value {v} < min {spec['min']}."
+                    })
+                if "max" in spec and v > spec["max"]:
+                    issues.append({
+                        "row_idx": idx, "column": col, "rule": "max", "value": v,
+                        "message": f"Value {v} > max {spec['max']}."
+                    })
+
+            # string length checks
+            if isinstance(v, str):
+                if "len_min" in spec and len(v) < spec["len_min"]:
+                    issues.append({
+                        "row_idx": idx, "column": col, "rule": "len_min", "value": v,
+                        "message": f"Length {len(v)} < len_min {spec['len_min']}."
+                    })
+                if "len_max" in spec and len(v) > spec["len_max"]:
+                    issues.append({
+                        "row_idx": idx, "column": col, "rule": "len_max", "value": v,
+                        "message": f"Length {len(v)} > len_max {spec['len_max']}."
+                    })
+
+            # allowed set
+            if "allowed" in spec and not is_null(v):
+                allowed = set(spec["allowed"])
+                if v not in allowed:
+                    issues.append({
+                        "row_idx": idx, "column": col, "rule": "allowed", "value": v,
+                        "message": f"Value {v!r} not in allowed set ({len(allowed)} items)."
+                    })
+
+            # regex check
+            if "regex" in spec and isinstance(v, str) and not is_null(v):
+                pattern = spec["regex"]
+                if re.fullmatch(pattern, v) is None:
+                    issues.append({
+                        "row_idx": idx, "column": col, "rule": "regex", "value": v,
+                        "message": "String does not match required pattern."
+                    })
+
+            # collect for uniqueness
+            if spec.get("unique") and not is_null(v):
+                track = unique_track[col]
+                if v in track["seen"]:
+                    track["dups"].add(idx)
+                else:
+                    track["seen"][v] = idx
+
+    # After scanning rows, emit uniqueness issues
+    for col, track in unique_track.items():
+        if not track["dups"]:
+            continue
+        # Mark first occurrences of dup values and all subsequent dups
+        first_idxs = set(track["seen"].values())
+        dup_firsts = {track["seen"][val] for val in track["seen"] if any(
+            rows[j].get(col) == val for j in track["dups"]
+        )}
+        for i in sorted(dup_firsts.union(track["dups"])):
+            issues.append({
+                "row_idx": i,
+                "column": col,
+                "rule": "unique",
+                "value": rows[i].get(col),
+                "message": "Duplicate value violates uniqueness."
+            })
+
+    return issues
