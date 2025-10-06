@@ -13,9 +13,9 @@ This function library provides the foundational utilities for a research data pi
 ## Problem Statement
 
 Researchers frequently face challenges when working with raw survey data, such as:
--Confusing column headers and inconsistent file structures from survey platforms
--Presence of personally identifiable information (PII) requiring removal or anonymization
--Mixed data types, missing values, and inconsistent formatting
--Lack of validation for input ranges or categorical responses
--Absence of standardized codebooks documenting dataset variables and structures
+  - Confusing column headers and inconsistent file structures from survey platforms
+  - Presence of personally identifiable information (PII) requiring removal or anonymization
+  - Mixed data types, missing values, and inconsistent formatting
+  - Lack of validation for input ranges or categorical responses
+  - Absence of standardized codebooks documenting dataset variables and structures
 Our function library addresses these issues by creating a consistent, automated process to clean and prepare research data for analysis, ensuring data integrity, security, and reproducibility.
