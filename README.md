@@ -20,3 +20,41 @@ Researchers frequently face challenges when working with raw survey data, such a
   - Absence of standardized codebooks documenting dataset variables and structures
 
 Our function library addresses these issues by creating a consistent, automated process to clean and prepare research data for analysis, ensuring data integrity, security, and reproducibility.
+
+---
+
+## Team Members and Roles
+
+**Karl Capili** – Data Cleaning & Validation Functions  
+- Implemented `normalize_header`, `cast_row_types`, `rename_columns`, and `validate_dataset`  
+- Built demo scripts demonstrating core functionality  
+
+
+
+---
+
+## Domain Focus and Problem Statement
+
+Researchers often struggle to prepare raw survey exports for analysis due to:
+- **Inconsistent column headers** and file formats  
+- **Mixed data types** (e.g., numeric vs. string inconsistencies)  
+- **Personally identifiable information (PII)** embedded in datasets  
+- **Missing values** or invalid categorical responses  
+- **Lack of structured documentation** describing dataset variables  
+
+Our library addresses these challenges by automating data cleaning and validation while preserving data integrity and privacy. It ensures that research datasets meet ethical standards, maintain reproducibility, and are ready for statistical or machine learning analysis.
+
+---
+
+## Installation and Setup
+
+1. Clone this repository:
+
+
+---
+
+## Quick Usage Examples
+
+
+
+## Repository Structure
