@@ -1,5 +1,6 @@
 import re
 
+# Simple 1 - Karl
 def normalize_header(name: str) -> str:
     """Normalize a column header to snake_case (safe for CSV/SQL).
 
@@ -39,4 +40,90 @@ def normalize_header(name: str) -> str:
     if s[0].isdigit():
         s = f"col_{s}"
     return s
+
+
+
+from datetime import datetime
+
+# Medium 1 - Karl
+def cast_row_types(row: dict, type_map: dict[str, str]) -> dict:
+    """Cast a row's values to configured types (int, float, bool, str, datetime:<fmt>).
+
+    Rules:
+      - Only casts columns listed in type_map (others are unchanged).
+      - Treats empty strings and common NA tokens ('na','n/a','null') as None.
+      - For bool: true/yes/1 -> True, false/no/0 -> False (case-insensitive).
+      - For datetime:<fmt>: uses strptime with the provided format.
+      - On cast failure, leaves the original value unchanged.
+
+    Args:
+        row: A single record mapping column -> raw value.
+        type_map: Mapping column -> type label, e.g., 'int', 'float', 'bool',
+                  'str', or 'datetime:%Y-%m-%d'.
+
+    Returns:
+        A new dict with values cast where possible.
+
+    Examples:
+        >>> r = {'age':'19','score':'3.5','consent':'Yes','joined':'2024-10-01'}
+        >>> tm = {'age':'int','score':'float','consent':'bool','joined':'datetime:%Y-%m-%d'}
+        >>> out = cast_row_types(r, tm)
+        >>> (out['age'], type(out['age'])) == (19, int)
+        True
+    """
+    if not isinstance(row, dict) or not isinstance(type_map, dict):
+        raise TypeError("cast_row_types: 'row' and 'type_map' must be dicts")
+
+    def to_none_if_blank(x):
+        if x is None:
+            return None
+        if isinstance(x, str):
+            s = x.strip().lower()
+            if s in ("", "na", "n/a", "null"):
+                return None
+        return x
+
+    def to_bool(x):
+        if isinstance(x, bool):
+            return x
+        if x is None:
+            return None
+        s = str(x).strip().lower()
+        if s in ("true", "yes", "y", "1"):
+            return True
+        if s in ("false", "no", "n", "0"):
+            return False
+        raise ValueError("not a bool")
+
+    out = dict(row)
+    for col, tlabel in type_map.items():
+        if col not in out:
+            continue
+        raw = to_none_if_blank(out[col])
+
+        if tlabel == "str":
+            out[col] = None if raw is None else str(raw)
+            continue
+
+        if raw is None:
+            out[col] = None
+            continue
+
+        try:
+            if tlabel == "int":
+                out[col] = int(float(raw))  # handles "19.0"
+            elif tlabel == "float":
+                out[col] = float(raw)
+            elif tlabel == "bool":
+                out[col] = to_bool(raw)
+            elif tlabel.startswith("datetime:"):
+                fmt = tlabel.split(":", 1)[1]
+                out[col] = datetime.strptime(str(raw), fmt)
+            else:
+                raise ValueError(f"Unsupported type label: {tlabel}")
+        except Exception:
+            # Leave value as-is on cast failure
+            out[col] = raw
+    return out
+
 
