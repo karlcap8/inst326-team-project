@@ -33,3 +33,27 @@ print(rename_columns(row, rename_map))
 # Expected example:
 # {'age': '19', 'consent': 'Yes', 'Note': 'ok'}
 
+
+# Complex 1 - Karl
+from src.research_data_lib import validate_dataset
+
+rows = [
+    {"id": "A1", "age": "19", "consent": "Yes", "score": "3.5", "joined": "2024-10-01"},
+    {"id": "A2", "age": "-5", "consent": "no",  "score": "x",   "joined": "2024-13-01"},
+    {"id": "A1", "age": "200", "consent": "Y",  "score": "4.2", "joined": "2024-09-30"},
+    {"id": "",   "age": "  ",  "consent": "",   "score": "",    "joined": ""},
+]
+
+rules = {
+    "id": {"type": "str", "required": True, "len_min": 1, "unique": True},
+    "age": {"type": "int", "min": 0, "max": 120, "required": True},
+    "consent": {"type": "bool", "required": True},
+    "score": {"type": "float", "min": 0.0, "max": 5.0},
+    "joined": {"type": "datetime:%Y-%m-%d"},
+}
+
+issues = validate_dataset(rows, rules)
+print(f"Issues found: {len(issues)}")
+for e in issues:
+    print(e)
+# Expect: type/range/required/unique violations across several rows
