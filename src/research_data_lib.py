@@ -127,3 +127,64 @@ def cast_row_types(row: dict, type_map: dict[str, str]) -> dict:
     return out
 
 
+# Medium 2- Karl
+def rename_columns(
+    row: dict,
+    rename_map: dict[str, str],
+    *,
+    drop_unmapped: bool = False,
+    normalize_targets: bool = True,
+) -> dict:
+    """Rename columns in a single row using a mapping, with safe collision handling.
+
+    Behavior:
+      - If a source key exists in rename_map and maps to a non-empty string, rename it.
+      - If a mapping value is an empty string (""), the column is dropped.
+      - If a source key is not in rename_map:
+          - keep it as-is by default; or
+          - drop it if drop_unmapped=True.
+      - If normalize_targets=True, target names are passed through normalize_header().
+      - If the new name already exists, suffix with _2, _3, ... to avoid collision.
+
+    Args:
+        row: A single record (column -> value).
+        rename_map: Mapping of old_name -> new_name (use "" to drop a column).
+        drop_unmapped: If True, drop columns not present in rename_map.
+        normalize_targets: If True, normalize target names via normalize_header().
+
+    Returns:
+        A new dict with renamed (and possibly dropped) keys.
+    """
+    if not isinstance(row, dict) or not isinstance(rename_map, dict):
+        raise TypeError("rename_columns: 'row' and 'rename_map' must be dicts")
+
+    out: dict = {}
+
+    def put_safe(k: str, v):
+        # Ensure unique keys by suffixing _2, _3, ...
+        base = k
+        idx = 2
+        while k in out:
+            k = f"{base}_{idx}"
+            idx += 1
+        out[k] = v
+
+    for old_key, value in row.items():
+        if old_key in rename_map:
+            new_key = rename_map[old_key]
+            # Empty string means drop this column
+            if new_key == "":
+                continue
+            if normalize_targets:
+                # Reuse our simple normalizer from above
+                new_key = normalize_header(new_key)
+            put_safe(new_key, value)
+        else:
+            # Not mapped
+            if drop_unmapped:
+                continue
+            put_safe(old_key, value)
+
+    return out
+
+
