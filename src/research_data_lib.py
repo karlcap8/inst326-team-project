@@ -379,3 +379,184 @@ def validate_dataset(rows: list[dict], rules: dict) -> list[dict]:
             })
 
     return issues
+
+
+
+#Sukhman - Simple Function
+def strip_whitespace(df):
+    """
+    Short Description:
+        Removes leading and trailing whitespace from all string columns in a DataFrame.
+
+    Rules:
+        - Operates only on columns with dtype 'object' or 'string'.
+        - Returns a cleaned copy of the DataFrame.
+        - Does not modify the original DataFrame.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame to clean.
+
+    Returns:
+        pd.DataFrame: A new DataFrame with stripped string values.
+
+    Raises:
+        TypeError: If df is not a pandas DataFrame.
+
+    Example:
+        >>> clean_df = strip_whitespace(raw_df)
+    """
+    import pandas as pd
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+    df = df.copy()
+    for col in df.columns:
+        if df[col].dtype == "object":
+            df[col] = df[col].astype(str).str.strip()
+    return df
+
+#Sukhman - Medium Function 1
+def merge_datasets(df_list, how="outer"):
+    """
+    Short Description:
+        Merges multiple pandas DataFrames on their shared columns.
+
+    Rules:
+        - Requires at least one common column to merge on.
+        - All inputs must be DataFrames.
+        - Returns a merged DataFrame with duplicate columns removed.
+
+    Args:
+        df_list (list[pd.DataFrame]): List of DataFrames to merge.
+        how (str): Type of merge to perform ("inner", "outer", "left", "right").
+
+    Returns:
+        pd.DataFrame: A merged DataFrame.
+
+    Raises:
+        ValueError: If list is empty or has no common columns.
+        TypeError: If any list element is not a DataFrame.
+
+    Example:
+        >>> combined = merge_datasets([survey1, survey2, survey3], how="outer")
+    """
+    import pandas as pd
+    if not df_list:
+        raise ValueError("merge_datasets: empty list provided.")
+    if not all(isinstance(df, pd.DataFrame) for df in df_list):
+        raise TypeError("merge_datasets: all items must be DataFrames.")
+
+    merged = df_list[0].copy()
+    for df in df_list[1:]:
+        common_cols = list(set(merged.columns) & set(df.columns))
+        if not common_cols:
+            raise ValueError("merge_datasets: no common columns to merge on.")
+        merged = pd.merge(merged, df, on=common_cols, how=how)
+        merged = merged.loc[:, ~merged.columns.duplicated()]
+
+    merged.reset_index(drop=True, inplace=True)
+    return merged
+
+#Sukhman - Medium Function 2
+def fill_missing_values(df, strategy="median"):
+    """
+    Short Description:
+        Fills missing numeric values in a DataFrame using a specified strategy.
+
+    Rules:
+        - Works only on numeric columns.
+        - Strategy options: "mean", "median", "mode", or "zero".
+        - Returns a new DataFrame; original is not modified.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame.
+        strategy (str): Method to fill missing values.
+
+    Returns:
+        pd.DataFrame: DataFrame with filled numeric values.
+
+    Raises:
+        TypeError: If input is not a DataFrame.
+        ValueError: If strategy is unsupported.
+
+    Example:
+        >>> clean_df = fill_missing_values(df, strategy="mean")
+    """
+    import pandas as pd
+    import numpy as np
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a DataFrame.")
+    if strategy not in ("mean", "median", "mode", "zero"):
+        raise ValueError("Unsupported strategy.")
+
+    df = df.copy()
+    for col in df.select_dtypes(include=[np.number]).columns:
+        if strategy == "mean":
+            val = df[col].mean()
+        elif strategy == "median":
+            val = df[col].median()
+        elif strategy == "mode":
+            mode_vals = df[col].mode()
+            val = mode_vals[0] if not mode_vals.empty else 0
+        else:
+            val = 0
+        df[col].fillna(val, inplace=True)
+    return df
+
+#Sukhman - Complex Function
+def generate_data_report(df, filename="data_report.txt"):
+    """
+    Short Description:
+        Generates a structured text report summarizing key statistics of a DataFrame.
+
+    Rules:
+        - Calculates missing percentages, unique counts, and sample values per column.
+        - Writes results to a .txt file with timestamp.
+        - Creates the output directory if it doesn't exist.
+
+    Args:
+        df (pd.DataFrame): Input dataset to analyze.
+        filename (str): Output file path for the report.
+
+    Returns:
+        str: Path to the generated report.
+
+    Raises:
+        TypeError: If input is not a DataFrame.
+        ValueError: If the DataFrame is empty.
+
+    Example:
+        >>> report_path = generate_data_report(clean_df, "outputs/report.txt")
+    """
+    import pandas as pd
+    import numpy as np
+    import datetime, os
+
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("df must be a DataFrame.")
+    if df.empty:
+        raise ValueError("Cannot generate report on empty DataFrame.")
+
+    lines = []
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    lines.append(f"DATA REPORT - {now}\n" + "=" * 80 + "\n")
+    lines.append(f"Rows: {len(df)}, Columns: {len(df.columns)}\n\n")
+
+    for col in df.columns:
+        series = df[col]
+        dtype = str(series.dtype)
+        missing = series.isna().sum()
+        missing_pct = round((missing / len(df)) * 100, 2)
+        unique_vals = series.nunique(dropna=True)
+        sample_vals = series.dropna().unique()[:5]
+        lines.append(f"{col} ({dtype})\n")
+        lines.append(f"  Missing: {missing} ({missing_pct}%)\n")
+        lines.append(f"  Unique: {unique_vals}\n")
+        lines.append("  Sample: " + ", ".join(map(str, sample_vals)) + "\n")
+        lines.append("-" * 80 + "\n")
+
+    os.makedirs(os.path.dirname(filename) or ".", exist_ok=True)
+    with open(filename, "w", encoding="utf-8") as f:
+        f.writelines(lines)
+
+    return filename
+
