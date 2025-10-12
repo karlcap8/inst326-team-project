@@ -46,17 +46,6 @@ Our library addresses these challenges by automating data cleaning and validatio
 
 ---
 
-## Installation and Setup
-
-1. Clone this repository:
-
-
----
-
-## Quick Usage Examples
-
-
-
 ## Repository Structure
 inst326-team-project/ 
 ├── README.md 
