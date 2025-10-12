@@ -257,12 +257,5 @@ Issues found: 6
 {'row_idx': 2, 'column': 'id', 'rule': 'unique', 'value': 'A1', 'message': 'Duplicate value violates uniqueness.'}
 ```
 
----
-
-```
-
----
-
-
 
 
