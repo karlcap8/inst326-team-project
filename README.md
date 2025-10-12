@@ -58,15 +58,15 @@ Our library addresses these challenges by automating data cleaning and validatio
 
 
 ## Repository Structure
-inst326-team-project/
-├── README.md
-├── requirements.txt
-├── src/
-│ ├── init.py
-│ ├── research_data_lib.py
-│ └── src_readme.txt
-├── docs/
-│ ├── function_reference.md
-│ └── usage_examples.md
-└── examples/
-└── demo_script.py
+inst326-team-project/ 
+├── README.md 
+├── requirements.txt 
+├── src/ 
+│ ├── init.py 
+│ ├── research_data_lib.py 
+│ └── src_readme.txt 
+├── docs/ 
+│ ├── function_reference.md 
+│ └── usage_examples.md 
+└── examples/ 
+└── demo_script.py 
