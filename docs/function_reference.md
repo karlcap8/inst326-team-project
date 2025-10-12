@@ -494,3 +494,125 @@ print(validate_email(email))  # Returns: True
 email = "invalid-email"
 print(validate_email(email))  # Returns: False
 
+## `filter_rows_by_condition(df, condition_func)`
+
+**Purpose:**  
+Filter rows in a DataFrame based on a custom condition function.
+
+### Parameters:
+- `df` (pd.DataFrame): The DataFrame to filter.
+- `condition_func` (function): A function that takes a row (as a Series) and returns a boolean. This function is applied to each row, and only rows where the function evaluates to `True` will be included in the result.
+
+### Returns:
+- `pd.DataFrame`: A DataFrame containing the rows that meet the condition specified by `condition_func`.
+
+### Raises:
+- `TypeError`: If `df` is not a pandas DataFrame or `condition_func` is not callable.
+
+### Behavior:
+- Filters the rows of the DataFrame where the `condition_func` evaluates to `True` for each row.
+- The filtering happens by applying `condition_func` to each row, and the resulting rows are returned in a new DataFrame.
+
+### Example Usage:
+
+```python
+import pandas as pd
+from your_module import filter_rows_by_condition
+
+# Sample DataFrame
+df = pd.DataFrame({
+    "name": ["Alice", "Bob", "Charlie", "David"],
+    "age": [25, 35, 30, 40],
+    "city": ["New York", "Los Angeles", "Chicago", "Miami"]
+})
+
+# Custom filter condition: filter by age greater than 30
+filtered_df = filter_rows_by_condition(df, lambda row: row['age'] > 30)
+
+print(filtered_df)
+
+
+## `count_unique_values(df)`
+
+**Purpose:**  
+Count the number of unique values for each column in a DataFrame.
+
+### Parameters:
+- `df` (pd.DataFrame): The DataFrame to analyze.
+
+### Returns:
+- `dict`: A dictionary where the keys are column names and the values are the count of unique values for each respective column.
+
+### Raises:
+- `TypeError`: If `df` is not a pandas DataFrame.
+
+### Behavior:
+- The function iterates through each column in the DataFrame and counts how many unique values exist in that column.
+- The result is returned as a dictionary where the column names are the keys, and the number of unique values for each column is the value.
+
+### Example Usage:
+
+```python
+import pandas as pd
+from your_module import count_unique_values
+
+# Sample DataFrame
+df = pd.DataFrame({
+    "name": ["Alice", "Bob", "Charlie", "Alice", "Bob"],
+    "age": [25, 35, 30, 25, 35],
+    "city": ["New York", "Los Angeles", "Chicago", "New York", "Los Angeles"]
+})
+
+# Count unique values for each column
+unique_counts = count_unique_values(df)
+
+print(unique_counts)
+
+
+
+## `pivot_and_aggregate(df, pivot_column, value_column, agg_func='sum')`
+
+**Purpose:**  
+Pivot a DataFrame and aggregate values using the specified aggregation function.
+
+### Parameters:
+- `df` (pd.DataFrame): The DataFrame to pivot.
+- `pivot_column` (str): The column to use for pivoting.
+- `value_column` (str): The column whose values will be aggregated.
+- `agg_func` (str, optional): The aggregation function to use. Default is `'sum'`. Supported values are:
+  - `'sum'`: Sum of values.
+  - `'mean'`: Mean (average) of values.
+  - `'count'`: Count of non-NA values.
+  - `'min'`: Minimum value.
+  - `'max'`: Maximum value.
+  - `'std'`: Standard deviation.
+  - Others: Any other pandas-supported aggregation function.
+
+### Returns:
+- `pd.DataFrame`: A DataFrame with the pivoted and aggregated values.
+
+### Raises:
+- `ValueError`: If the `pivot_column` or `value_column` does not exist in the DataFrame.
+- `TypeError`: If `df` is not a pandas DataFrame.
+
+### Behavior:
+- The function pivots the DataFrame using the specified `pivot_column` and aggregates the values in the `value_column` based on the chosen `agg_func`.
+- It returns a new DataFrame that contains the pivoted structure, with the aggregation performed as specified.
+
+### Example Usage:
+
+```python
+import pandas as pd
+from your_module import pivot_and_aggregate
+
+# Sample DataFrame
+df = pd.DataFrame({
+    "category": ["A", "B", "A", "B", "A"],
+    "sales": [100, 200, 150, 250, 300],
+    "region": ["East", "West", "East", "West", "East"]
+})
+
+# Pivot and aggregate using sum as the aggregation function
+pivot_df = pivot_and_aggregate(df, pivot_column="category", value_column="sales", agg_func="sum")
+
+print(pivot_df)
