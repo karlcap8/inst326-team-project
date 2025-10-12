@@ -107,9 +107,8 @@ print(merged_df)
 # Columns: ID, Name, Score, City
 # NaN values where data is missing
 
-# ============================================================
+
 # Sukhman - Medium Function Demo 2
-# ============================================================
 from src.research_data_lib import fill_missing_values
 import pandas as pd
 import numpy as np
@@ -132,9 +131,7 @@ print(filled_df)
 # Original DataFrame unchanged.
 
 
-# ============================================================
 # Sukhman - Complex Function Demo
-# ============================================================
 from src.research_data_lib import generate_data_report
 import pandas as pd
 import os
