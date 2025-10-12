@@ -493,6 +493,9 @@ print(validate_email(email))  # Returns: True
 # Invalid email
 email = "invalid-email"
 print(validate_email(email))  # Returns: False
+```
+
+
 
 ## `filter_rows_by_condition(df, condition_func)`
 
@@ -530,6 +533,7 @@ df = pd.DataFrame({
 filtered_df = filter_rows_by_condition(df, lambda row: row['age'] > 30)
 
 print(filtered_df)
+```
 
 
 ## `count_unique_values(df)`
@@ -567,7 +571,7 @@ df = pd.DataFrame({
 unique_counts = count_unique_values(df)
 
 print(unique_counts)
-
+```
 
 
 ## `pivot_and_aggregate(df, pivot_column, value_column, agg_func='sum')`
@@ -616,3 +620,4 @@ df = pd.DataFrame({
 pivot_df = pivot_and_aggregate(df, pivot_column="category", value_column="sales", agg_func="sum")
 
 print(pivot_df)
+```
