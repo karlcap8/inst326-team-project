@@ -560,3 +560,110 @@ def generate_data_report(df, filename="data_report.txt"):
 
     return filename
 
+
+
+#Simple 1 - Harrang
+import re
+
+def validate_email(email: str) -> bool:
+    """Validate an email address using a regular expression.
+
+    Args:
+        email (str): The email address to validate.
+
+    Returns:
+        bool: True if the email is valid, False otherwise.
+
+    Raises:
+        TypeError: If email is not a string.
+
+    Examples:
+        >>> validate_email("test@example.com")
+        True
+        >>> validate_email("invalid-email")
+        False
+    """
+    if not isinstance(email, str):
+        raise TypeError("Input must be a string.")
+    
+    email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+    return bool(re.match(email_regex, email))
+
+#Medium 1 - Harrang
+def filter_rows_by_condition(df, condition_func):
+    """Filter rows in a DataFrame based on a custom condition function.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to filter.
+        condition_func (function): A function that takes a row (as a Series) and returns a boolean.
+
+    Returns:
+        pd.DataFrame: A DataFrame with rows that meet the condition.
+
+    Raises:
+        TypeError: If df is not a pandas DataFrame or condition_func is not callable.
+
+    Example:
+        >>> filtered_df = filter_rows_by_condition(df, lambda row: row['age'] > 30)
+    """
+    import pandas as pd
+    
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+    if not callable(condition_func):
+        raise TypeError("condition_func must be a callable function.")
+    
+    return df[df.apply(condition_func, axis=1)]
+
+
+#Medium 2 - Harrang
+def count_unique_values(df) -> dict:
+    """Count the number of unique values for each column in the DataFrame.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to analyze.
+
+    Returns:
+        dict: A dictionary where the keys are column names and values are the unique count.
+
+    Raises:
+        TypeError: If df is not a pandas DataFrame.
+
+    Example:
+        >>> unique_counts = count_unique_values(df)
+    """
+    import pandas as pd
+    
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+    
+    return {col: df[col].nunique() for col in df.columns}
+
+#Complex 1 - Harrang
+def pivot_and_aggregate(df, pivot_column: str, value_column: str, agg_func: str = 'sum') -> pd.DataFrame:
+    """Pivot a DataFrame and aggregate values using the specified aggregation function.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to pivot.
+        pivot_column (str): The column to use for pivoting.
+        value_column (str): The column whose values will be aggregated.
+        agg_func (str): The aggregation function to use ('sum', 'mean', 'count', etc.).
+
+    Returns:
+        pd.DataFrame: A DataFrame with the pivoted and aggregated values.
+
+    Raises:
+        ValueError: If the pivot_column or value_column does not exist in the DataFrame.
+        TypeError: If df is not a pandas DataFrame.
+
+    Example:
+        >>> pivot_df = pivot_and_aggregate(df, 'category', 'sales', 'mean')
+    """
+    import pandas as pd
+
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+    if pivot_column not in df.columns or value_column not in df.columns:
+        raise ValueError(f"Columns {pivot_column} or {value_column} not found in the DataFrame.")
+
+    return df.pivot_table(index=pivot_column, values=value_column, aggfunc=agg_func)
