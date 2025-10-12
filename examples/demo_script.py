@@ -57,3 +57,101 @@ print(f"Issues found: {len(issues)}")
 for e in issues:
     print(e)
 # Expect: type/range/required/unique violations across several rows
+
+
+
+#Sukhman - Simple Function Demo
+from src.research_data_lib import strip_whitespace
+import pandas as pd
+
+raw_df = pd.DataFrame({
+    "Name": ["  Sydney  ", " Jordan", "Tommy "],
+    "Email": [" alice@email.com ", "bob@email.com ", " charlie@email.com"],
+    "Score": [85, 90, 78]
+})
+
+print("Original DataFrame:")
+print(raw_df)
+
+clean_df = strip_whitespace(raw_df)
+
+print("\nAfter strip_whitespace():")
+print(clean_df)
+
+# Expected: No leading/trailing spaces in string columns
+# Original DataFrame remains unchanged
+print("\nCheck original unchanged:", raw_df.equals(clean_df) is False)
+
+
+# Sukhman - Medium Function Demo 1
+from src.research_data_lib import merge_datasets
+import pandas as pd
+
+df1 = pd.DataFrame({
+    "ID": [1, 2, 3],
+    "Name": ["John", "Jessie", "Andrew"],
+    "Score": [85, 90, 78]
+})
+
+df2 = pd.DataFrame({
+    "ID": [2, 3, 4],
+    "City": ["NYC", "LA", "Chicago"]
+})
+
+merged_df = merge_datasets([df1, df2], how="outer")
+print("\nMerged DataFrame:")
+print(merged_df)
+
+# Expected:
+# Includes all IDs 1–4
+# Columns: ID, Name, Score, City
+# NaN values where data is missing
+
+# ============================================================
+# Sukhman - Medium Function Demo 2
+# ============================================================
+from src.research_data_lib import fill_missing_values
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    "Math": [85, np.nan, 78],
+    "Science": [np.nan, 90, np.nan],
+    "English": [88, 92, np.nan]
+})
+
+print("Original DataFrame:")
+print(df)
+
+filled_df = fill_missing_values(df, strategy="mean")
+print("\nAfter fill_missing_values(strategy='mean'):")
+print(filled_df)
+
+# Expected:
+# Missing numeric values replaced with column means.
+# Original DataFrame unchanged.
+
+
+# ============================================================
+# Sukhman - Complex Function Demo
+# ============================================================
+from src.research_data_lib import generate_data_report
+import pandas as pd
+import os
+
+data = {
+    "Name": ["Gemma", "Harry", "Jaden", "David"],
+    "Score": [85, None, 78, 90],
+    "City": ["NYC", "LA", "Chicago", None]
+}
+df = pd.DataFrame(data)
+
+report_path = generate_data_report(df, "outputs/demo_data_report.txt")
+
+print("\nReport generated at:", report_path)
+print("File exists:", os.path.exists(report_path))
+
+# Expected:
+# File "outputs/demo_data_report.txt" created
+# Contains summary stats (missing %, unique counts, sample values)
+
