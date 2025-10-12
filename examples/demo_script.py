@@ -152,3 +152,93 @@ print("File exists:", os.path.exists(report_path))
 # File "outputs/demo_data_report.txt" created
 # Contains summary stats (missing %, unique counts, sample values)
 
+
+
+
+# Harrang -  Simple Demo
+from src.research_data_lib import validate_email
+
+# Valid email
+valid_email = "test@example.com"
+print(f"Is '{valid_email}' a valid email? {validate_email(valid_email)}")
+
+# Invalid email
+invalid_email = "invalid-email"
+print(f"Is '{invalid_email}' a valid email? {validate_email(invalid_email)}")
+
+# Expected output:
+# Is 'test@example.com' a valid email? True
+# Is 'invalid-email' a valid email? False
+
+
+# Harrang - Medium Demo
+import pandas as pd
+from src.research_data_lib import filter_rows_by_condition
+
+# Sample DataFrame
+data = {
+    'name': ['Alice', 'Bob', 'Charlie', 'David'],
+    'age': [25, 35, 40, 20],
+    'city': ['NY', 'LA', 'SF', 'LA']
+}
+df = pd.DataFrame(data)
+
+# Filter rows where age is greater than 30
+filtered_df = filter_rows_by_condition(df, lambda row: row['age'] > 30)
+
+print("Filtered DataFrame (age > 30):")
+print(filtered_df)
+
+# Expected output:
+# Filtered DataFrame (age > 30):
+#     name  age city
+# 1    Bob   35   LA
+# 2  Charlie   40   SF
+
+
+# Harrang - Medium Demo 2
+import pandas as pd
+from src.research_data_lib import count_unique_values
+
+# Sample DataFrame
+data = {
+    'name': ['Alice', 'Bob', 'Charlie', 'Alice'],
+    'age': [25, 35, 40, 25],
+    'city': ['NY', 'LA', 'SF', 'NY']
+}
+df = pd.DataFrame(data)
+
+# Count unique values in each column
+unique_counts = count_unique_values(df)
+
+print("Unique Value Counts:")
+print(unique_counts)
+
+# Expected output:
+# Unique Value Counts:
+# {'name': 3, 'age': 3, 'city': 3}
+
+
+# Harrang - Complex Demo
+import pandas as pd
+from src.research_data_lib import pivot_and_aggregate
+
+# Sample DataFrame
+data = {
+    'category': ['A', 'A', 'B', 'B', 'A', 'B'],
+    'sales': [100, 150, 200, 250, 120, 300]
+}
+df = pd.DataFrame(data)
+
+# Pivot the DataFrame by 'category' and aggregate 'sales' using the sum
+pivot_df = pivot_and_aggregate(df, pivot_column='category', value_column='sales', agg_func='sum')
+
+print("Pivoted and Aggregated DataFrame (sum of sales):")
+print(pivot_df)
+
+# Expected output:
+# Pivoted and Aggregated DataFrame (sum of sales):
+#            sales
+# category        
+# A            370
+# B            750
