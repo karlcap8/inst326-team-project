@@ -257,5 +257,202 @@ Issues found: 6
 {'row_idx': 2, 'column': 'id', 'rule': 'unique', 'value': 'A1', 'message': 'Duplicate value violates uniqueness.'}
 ```
 
+---
+### strip_whitespace(df: pd.DataFrame) -> pd.DataFrame
 
+**Purpose:** 
+Remove leading and trailing whitespace from all string-type columns in a pandas DataFrame.
 
+**Parameters:** 
+
+* df (pd.DataFrame): Input dataset containing string and/or numeric columns.
+
+**Returns:** 
+
+* pd.DataFrame - A new DataFrame with all string columns cleaned of extra spaces.
+
+**Raises:** 
+
+* TypeError - If the input is not a pandas DataFrame.
+
+**Behavior:** 
+
+* Operates only on columns with dtype object or string.
+
+* Creates and returns a copy, leaving the original DataFrame unmodified.
+
+* Uses pandas .str.strip() to clean whitespace from text fields
+
+**Example Usage**
+
+```python
+from src.research_data_lib import strip_whitespace
+import pandas as pd
+
+raw_df = pd.DataFrame({"Name": ["  Jimmy  ", " Bob", "Tim "]})
+clean_df = strip_whitespace(raw_df)
+```
+**Example Output:**
+
+```python
+# Returns a new DataFrame:
+#   Name
+# 0  Jimmy
+# 1  Bob
+# 2  Tim
+```
+
+---
+### merge_datasets(df_list: list[pd.DataFrame], how: str = "outer") -> pd.DataFrame
+
+**Purpose:**
+Merge multiple pandas DataFrames on their shared columns into a single combined dataset.
+
+**Parameters:**
+
+* df_list (list[pd.DataFrame]): List of DataFrames to merge.
+
+* how (str, optional): Merge strategy — one of "inner", "outer", "left", or "right". Defaults to "outer".
+
+**Returns:**
+
+* pd.DataFrame - The merged DataFrame containing data from all sources.
+
+**Raises:**
+
+* ValueError - If the list is empty or the DataFrames have no shared columns.
+
+* TypeError - If any element in the list is not a DataFrame.
+
+**Behavior:**
+
+* Finds shared columns dynamically and merges iteratively across all DataFrames.
+
+* Removes duplicated columns after each merge.
+
+* Resets the index after completion.
+
+**Example Usage:**
+
+```python
+from src.research_data_lib import merge_datasets
+import pandas as pd
+
+df1 = pd.DataFrame({"ID": [1, 2], "Score": [85, 90]})
+df2 = pd.DataFrame({"ID": [2, 3], "City": ["NYC", "LA"]})
+
+merged = merge_datasets([df1, df2], how="outer")
+```
+**Example Output:**
+
+```python
+# Returns DataFrame:
+#    ID  Score   City
+# 0   1   85.0    NaN
+# 1   2   90.0    NYC
+# 2   3    NaN     LA
+```
+
+---
+### fill_missing_values(df: pd.DataFrame, strategy: str = "median") -> pd.DataFrame
+
+**Purpose:**
+Fill missing numeric values in a DataFrame using a specified imputation strategy.
+
+**Parameters:**
+
+* df (pd.DataFrame): Input dataset containing missing values.
+
+* strategy (str, optional): Method for imputation - "mean", "median", "mode", or "zero". Defaults to "median".
+
+**Returns:**
+
+* pd.DataFrame - A new DataFrame with numeric NaNs replaced using the chosen method.
+
+**Raises:**
+
+* TypeError - If input is not a DataFrame.
+
+* ValueError - If an unsupported strategy is provided.
+
+**Behavior:**
+
+* Operates only on numeric columns (int, float).
+
+* Automatically calculates replacement values based on the strategy.
+
+* Does not modify the original DataFrame.
+
+**Example Usage:**
+
+```python
+from src.research_data_lib import fill_missing_values
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    "Math": [90, np.nan, 80],
+    "Science": [np.nan, 85, np.nan]
+})
+
+filled = fill_missing_values(df, strategy="mean")
+# Missing values replaced with column means.
+```
+
+---
+### generate_data_report(df: pd.DataFrame, filename: str = "data_report.txt") -> str
+
+**Purpose:**
+Generate a structured text report summarizing column-level statistics for a DataFrame.
+
+**Parameters:**
+
+* df (pd.DataFrame): Dataset to analyze.
+
+* filename (str, optional): Path and name for the output .txt report file. Defaults to "data_report.txt".
+
+**Returns:**
+
+* str - The path of the generated report file.
+
+**Raises:**
+
+* TypeError - If input is not a DataFrame.
+
+* ValueError - If the DataFrame is empty.
+
+**Behavior:**
+
+* Calculates missing value counts and percentages per column.
+
+* Records unique counts and sample values (up to 5 examples).
+
+* Automatically includes timestamp and file metadata.
+
+* Creates output directories if needed.
+
+**Example Usage:**
+
+```python
+from src.research_data_lib import generate_data_report
+import pandas as pd
+
+df = pd.DataFrame({
+    "Name": ["Alex", "Aidan", "Jake"],
+    "Score": [85, None, 92]
+})
+
+path = generate_data_report(df, "outputs/report.txt")
+```
+
+**Example Output:**
+
+```python
+# Creates a detailed text file like:
+# DATA REPORT - 2025-10-12 14:35:22
+# Rows: 3, Columns: 2
+# Name (object)
+#   Missing: 0 (0.0%)
+#   Unique: 3
+#   Sample: Alex, Aidan, Jake
+```
