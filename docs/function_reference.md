@@ -458,34 +458,32 @@ path = generate_data_report(df, "outputs/report.txt")
 ```
 
 validate_email(email: str) -> bool
-
 Purpose:
-Validate an email address using a regular expression to ensure the format is correct.
-
+ Validate an email address using a regular expression to ensure the format is correct.
 Parameters:
+email (str): The email address to validate (e.g., "test@example.com").
 
-email (str): The email address to validate (e.g., "test@example.com
-").
 
 Returns:
-
 bool: True if the email is valid, False otherwise.
 
-Raises:
 
+Raises:
 TypeError: If email is not a string.
 
-Behavior:
 
-Uses a regular expression to check if the email address follows a standard email pattern (e.g., "example@domain.com
-").
+Behavior:
+Uses a regular expression to check if the email address follows a standard email pattern (e.g., "example@domain.com").
+
 
 Returns True for valid emails and False for invalid ones.
 
+
 If the input is not a string, a TypeError is raised.
 
-Example Usage:
+**Example Usage**
 
+```
 from src.research_data_lib import validate_email
 
 # Valid email
@@ -495,4 +493,5 @@ print(validate_email(email))  # Returns: True
 # Invalid email
 email = "invalid-email"
 print(validate_email(email))  # Returns: False
+```
 
