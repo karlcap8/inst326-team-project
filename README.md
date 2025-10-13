@@ -23,16 +23,6 @@ Our function library addresses these issues by creating a consistent, automated 
 
 ---
 
-## Team Members and Roles
-
-**Karl Capili** – Data Cleaning & Validation Functions  
-- Implemented `normalize_header`, `cast_row_types`, `rename_columns`, and `validate_dataset`  
-- Built demo scripts demonstrating core functionality  
-
-
-
----
-
 ## Domain Focus and Problem Statement
 
 Researchers often struggle to prepare raw survey exports for analysis due to:
