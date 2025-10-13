@@ -242,3 +242,114 @@ print(pivot_df)
 # category        
 # A            370
 # B            750
+
+
+
+
+# Simple 1 - Demo - Removing punctuation from string columns
+
+from src.research_data_lib import remove_punctuation
+import pandas as pd
+
+# Sample DataFrame
+data = {
+    "Name": ["Alice!", "Bob?", "Charlie."],
+    "Email": ["alice@email.com", "bob@email.com", "charlie@email.com"],
+    "Score": [90, 85, 88]
+}
+
+df = pd.DataFrame(data)
+
+print("Original DataFrame:")
+print(df)
+
+# Cleaned DataFrame
+clean_df = remove_punctuation(df)
+
+print("\nAfter remove_punctuation():")
+print(clean_df)
+
+# Expected output: No punctuation in "Name" and "Email" columns.
+
+
+# Medium 1 - Demo - Handling outliers in numeric columns
+
+from src.research_data_lib import handle_outliers
+import pandas as pd
+
+# Sample DataFrame with outliers
+data = {
+    "Age": [25, 30, 35, 40, 500],
+    "Score": [88, 92, 95, 78, 1000]
+}
+
+df = pd.DataFrame(data)
+
+print("Original DataFrame:")
+print(df)
+
+# Handle outliers
+clean_df = handle_outliers(df, threshold=1.5)
+
+print("\nAfter handle_outliers():")
+print(clean_df)
+
+
+
+# Medium 2 - Demo - Splitting multi-response column into separate binary columns
+
+from src.research_data_lib import split_multi_response
+import pandas as pd
+
+# Sample DataFrame with multi-response column
+data = {
+    "Responses": ["Yes, No", "Yes, Maybe", "No, Maybe"]
+}
+
+df = pd.DataFrame(data)
+
+print("Original DataFrame:")
+print(df)
+
+# Split the multi-response column into separate binary columns
+split_df = split_multi_response(df, column_name="Responses", delimiter=", ")
+
+print("\nAfter split_multi_response():")
+print(split_df)
+
+# Expected output:
+# A new DataFrame where the 'Responses' column is split into separate binary columns:
+# 'Responses_response_1', 'Responses_response_2', etc., with 1 or 0 indicating presence/absence of a response.
+
+
+
+# Complex 1 - Demo - Data profiling and report generation
+
+from src.research_data_lib import generate_data_profile
+import pandas as pd
+import os
+
+# Sample DataFrame with missing values and categorical data
+data = {
+    "Name": ["Alice", "Bob", "Charlie", "David"],
+    "Age": [25, 30, 35, None],
+    "Score": [90, None, 88, 92],
+    "City": ["NYC", "LA", "Chicago", "Chicago"]
+}
+
+df = pd.DataFrame(data)
+
+# Generate the data profiling report
+report_path = generate_data_profile(df, report_file="outputs/demo_data_report.txt")
+
+print("\nReport generated at:", report_path)
+print("File exists:", os.path.exists(report_path))
+
+# Expected output:
+# A report file "outputs/demo_data_report.txt" is generated.
+# The report contains:
+# - Missing percentage for each column
+# - Unique values count
+# - Statistical summary for numeric columns (mean, min, max, etc.)
+# - Histograms for numeric columns and bar charts for categorical columns
+
