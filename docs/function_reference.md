@@ -621,3 +621,178 @@ pivot_df = pivot_and_aggregate(df, pivot_column="category", value_column="sales"
 
 print(pivot_df)
 ```
+
+
+### `remove_punctuation(df: pd.DataFrame) -> pd.DataFrame`
+**Purpose:**  
+Remove punctuation from all string-type columns in a pandas DataFrame.
+
+**Parameters:**
+- `df (pd.DataFrame)`: Input DataFrame containing string or numeric columns.
+
+**Returns:**
+- `pd.DataFrame`: A new DataFrame with punctuation removed from string-type columns.
+
+**Raises:**
+- `TypeError`: If the input is not a pandas DataFrame.
+
+**Behavior:**
+- Operates only on columns with dtype `object` or `string`.
+- Removes all non-alphanumeric characters (punctuation marks) from string columns.
+- Leaves other columns (e.g., numeric, datetime) unchanged.
+- Creates and returns a copy, leaving the original DataFrame unmodified.
+
+**Example Usage:**
+
+```python
+from src.research_data_lib import remove_punctuation
+import pandas as pd
+
+df = pd.DataFrame({
+    "Name": ["Alice!", "Bob?", "Charlie."],
+    "Email": ["alice@email.com", "bob@email.com", "charlie@email.com"],
+    "Score": [90, 85, 88]
+})
+
+# Clean the DataFrame by removing punctuation
+clean_df = remove_punctuation(df)
+
+print(clean_df)
+# Example output:
+#    Name              Email  Score
+# 0  Alice     alice@email.com     90
+# 1    Bob      bob@email.com     85
+# 2 Charlie  charlie@email.com     88
+
+
+### `handle_outliers(df: pd.DataFrame, threshold: float = 1.5) -> pd.DataFrame`
+**Purpose:**  
+Identify and replace outliers in numeric columns using the Interquartile Range (IQR) method.
+
+**Parameters:**
+- `df (pd.DataFrame)`: Input DataFrame containing numeric columns.
+- `threshold (float, optional)`: The IQR threshold for identifying outliers. Default is `1.5`.
+
+**Returns:**
+- `pd.DataFrame`: A DataFrame where outliers are replaced by `NaN` (or removed based on the handling strategy).
+
+**Raises:**
+- `TypeError`: If the input is not a pandas DataFrame.
+- `ValueError`: If there are no numeric columns in the DataFrame.
+
+**Behavior:**
+- Computes the IQR for each numeric column.
+- Flags rows that fall outside the acceptable range (`Q1 - threshold * IQR` to `Q3 + threshold * IQR`).
+- Replaces the outlier values with `NaN`.
+- Returns a new DataFrame with outliers handled.
+
+**Example Usage:**
+
+```python
+from src.research_data_lib import handle_outliers
+import pandas as pd
+
+df = pd.DataFrame({
+    "Age": [25, 30, 35, 40, 500],
+    "Score": [88, 92, 95, 78, 1000]
+})
+
+# Handle outliers by replacing them with NaN
+clean_df = handle_outliers(df, threshold=1.5)
+
+print(clean_df)
+# Example output:
+#    Age  Score
+# 0  25   88.0
+# 1  30   92.0
+# 2  35   95.0
+# 3  40   78.0
+# 4 NaN   NaN
+
+
+### `split_multi_response(df: pd.DataFrame, column_name: str, delimiter: str = ",") -> pd.DataFrame`
+**Purpose:**  
+Split a column with multiple responses into separate binary columns based on the delimiter.
+
+**Parameters:**
+- `df (pd.DataFrame)`: Input DataFrame with a column containing multi-response values.
+- `column_name (str)`: The name of the column to split.
+- `delimiter (str, optional)`: The character used to separate multi-response values. Default is `","`.
+
+**Returns:**
+- `pd.DataFrame`: A DataFrame where the original multi-response column is split into separate binary columns (1 for presence, 0 for absence).
+
+**Raises:**
+- `TypeError`: If the input is not a pandas DataFrame or the column name is not a string.
+- `ValueError`: If the specified column doesn't exist in the DataFrame.
+
+**Behavior:**
+- Splits the values in the `column_name` based on the specified delimiter.
+- Creates new binary columns for each possible response, using the column name with a suffix like `_response_1`, `_response_2`, etc.
+- Fills the new columns with 1 for presence and 0 for absence of each response.
+
+**Example Usage:**
+
+```python
+from src.research_data_lib import split_multi_response
+import pandas as pd
+
+df = pd.DataFrame({
+    "Responses": ["Yes, No", "Yes, Maybe", "No, Maybe"]
+})
+
+# Split the multi-response column into separate binary columns
+split_df = split_multi_response(df, column_name="Responses", delimiter=", ")
+
+print(split_df)
+# Example output:
+#    Responses  Responses_response_1  Responses_response_2  Responses_response_3
+# 0  Yes, No                   1                   1                    0
+# 1  Yes, Maybe                1                   0                    1
+# 2  No, Maybe                 0                   1                    1
+
+
+### `generate_data_profile(df: pd.DataFrame, report_file: str = "data_profile_report.txt") -> str`
+
+**Purpose:**  
+Generate a structured text report summarizing column-level statistics, including missing values, unique counts, and sample values.
+
+**Parameters:**
+- `df (pd.DataFrame)`: The dataset to analyze.
+- `report_file (str, optional)`: Path and name for the output text report file. Default is `"data_profile_report.txt"`.
+
+**Returns:**
+- `str`: The path to the generated report file.
+
+**Raises:**
+- `TypeError`: If the input is not a pandas DataFrame.
+- `ValueError`: If the DataFrame is empty.
+
+**Behavior:**
+- Analyzes the DataFrame to compute the following for each column:
+  - Missing value percentage.
+  - Unique value count.
+  - Sample values (up to 5 examples).
+- Generates a timestamped report that includes these statistics.
+- Saves the report to the specified `report_file` and returns its path.
+
+**Example Usage:**
+
+```python
+from src.research_data_lib import generate_data_profile
+import pandas as pd
+
+df = pd.DataFrame({
+    "Name": ["Alice", "Bob", "Charlie", "David"],
+    "Age": [25, 30, 35, None],
+    "Score": [90, None, 88, 92]
+})
+
+# Generate the data profiling report
+report_path = generate_data_profile(df, report_file="outputs/data_profile_report.txt")
+
+print(f"Report generated at: {report_path}")
+# Example output:
+# Report generated at: outputs/data_profile_report.txt
+
+
