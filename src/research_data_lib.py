@@ -667,3 +667,186 @@ def pivot_and_aggregate(df, pivot_column: str, value_column: str, agg_func: str 
         raise ValueError(f"Columns {pivot_column} or {value_column} not found in the DataFrame.")
 
     return df.pivot_table(index=pivot_column, values=value_column, aggfunc=agg_func)
+
+
+
+
+#Simple 1
+
+import string
+
+def remove_punctuation(df):
+    """
+    Removes punctuation from all string columns in a DataFrame.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame.
+
+    Returns:
+        pd.DataFrame: DataFrame with punctuation removed from string columns.
+    
+    Raises:
+        TypeError: If input is not a DataFrame.
+    """
+    import pandas as pd
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+
+    df = df.copy()
+    for col in df.select_dtypes(include=[object, 'string']).columns:
+        df[col] = df[col].apply(lambda x: ''.join(c for c in str(x) if c not in string.punctuation))
+    return df
+
+
+#Medium 1
+def handle_outliers(df, threshold=1.5):
+    """
+    Detect and replace outliers in numeric columns using the IQR method.
+    
+    Args:
+        df (pd.DataFrame): Input DataFrame.
+        threshold (float): The threshold for detecting outliers based on IQR (default is 1.5).
+        
+    Returns:
+        pd.DataFrame: DataFrame with outliers replaced by NaN.
+    
+    Raises:
+        TypeError: If input is not a DataFrame.
+        ValueError: If threshold is not a positive number.
+    """
+    import pandas as pd
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+    if not isinstance(threshold, (int, float)) or threshold <= 0:
+        raise ValueError("Threshold must be a positive number.")
+
+    df = df.copy()
+    for col in df.select_dtypes(include=[float, int]).columns:
+        Q1 = df[col].quantile(0.25)
+        Q3 = df[col].quantile(0.75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - threshold * IQR
+        upper_bound = Q3 + threshold * IQR
+        df[col] = df[col].apply(lambda x: None if x < lower_bound or x > upper_bound else x)
+    return df
+
+
+#Medium 2
+def split_multi_response(df, column_name, delimiter=","):
+    """
+    Splits a column with multiple responses into separate binary columns.
+    
+    Args:
+        df (pd.DataFrame): Input DataFrame.
+        column_name (str): The column to split.
+        delimiter (str): The delimiter separating responses (default is a comma).
+        
+    Returns:
+        pd.DataFrame: DataFrame with the multi-response column split into separate columns.
+    
+    Raises:
+        TypeError: If input is not a DataFrame.
+        ValueError: If column_name is not found in the DataFrame.
+    """
+    import pandas as pd
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+    if column_name not in df.columns:
+        raise ValueError(f"Column '{column_name}' not found in the DataFrame.")
+
+    df = df.copy()
+    # Split responses by the delimiter and expand into new columns
+    responses = df[column_name].str.split(delimiter, expand=True)
+    for idx, col in enumerate(responses.columns):
+        new_col_name = f"{column_name}_response_{idx+1}"
+        df[new_col_name] = responses[col].notna().astype(int)  # Mark presence of response (1 or 0)
+    df.drop(columns=[column_name], inplace=True)
+    return df
+
+
+#Complex 1
+def generate_data_profile(df, report_file="data_profile_report.txt"):
+    """
+    Generate a comprehensive data profile for the DataFrame, including statistics and visualizations.
+    
+    Args:
+        df (pd.DataFrame): The input dataset.
+        report_file (str): Path to the output report file.
+        
+    Returns:
+        str: Path to the generated report.
+    
+    Raises:
+        TypeError: If input is not a DataFrame.
+        ValueError: If DataFrame is empty.
+    """
+    import pandas as pd
+    import numpy as np
+    import os
+    import matplotlib.pyplot as plt
+    from collections import Counter
+
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+    if df.empty:
+        raise ValueError("DataFrame is empty. Cannot generate a report.")
+
+    # Initialize report
+    report_lines = []
+    report_lines.append(f"Data Profiling Report\n{'='*50}\n")
+    
+    # Basic information
+    report_lines.append(f"Total Rows: {len(df)}\n")
+    report_lines.append(f"Total Columns: {len(df.columns)}\n\n")
+    
+    # Column-wise analysis
+    for col in df.columns:
+        series = df[col]
+        dtype = series.dtype
+        missing_count = series.isna().sum()
+        missing_pct = (missing_count / len(df)) * 100
+        unique_count = series.nunique(dropna=True)
+        
+        report_lines.append(f"Column: {col} ({dtype})")
+        report_lines.append(f"  Missing: {missing_count} ({missing_pct:.2f}%)")
+        report_lines.append(f"  Unique: {unique_count}\n")
+        
+        if np.issubdtype(dtype, np.number):  # Numeric columns
+            report_lines.append(f"  Mean: {series.mean():.2f}")
+            report_lines.append(f"  Median: {series.median():.2f}")
+            report_lines.append(f"  Std Dev: {series.std():.2f}")
+            report_lines.append(f"  Min: {series.min()}")
+            report_lines.append(f"  Max: {series.max()}\n")
+            
+            # Plot histogram
+            plt.hist(series.dropna(), bins=20, color='skyblue', edgecolor='black')
+            plt.title(f"Histogram of {col}")
+            plt.xlabel(col)
+            plt.ylabel('Frequency')
+            plt.savefig(f"{col}_histogram.png")
+            plt.close()
+
+        else:  # Categorical columns
+            value_counts = series.value_counts(dropna=True)
+            report_lines.append(f"  Value Counts:\n{value_counts}\n")
+            
+            # Plot bar chart for categories
+            value_counts.plot(kind='bar', color='skyblue', edgecolor='black')
+            plt.title(f"Bar Chart of {col}")
+            plt.ylabel('Count')
+            plt.savefig(f"{col}_barchart.png")
+            plt.close()
+
+    # Save report to file
+    os.makedirs(os.path.dirname(report_file), exist_ok=True)
+    with open(report_file, "w") as f:
+        f.writelines(report_lines)
+    
+    return report_file
+
+
+
+
+
+
+
