@@ -663,7 +663,7 @@ print(clean_df)
 # 0  Alice     alice@email.com     90
 # 1    Bob      bob@email.com     85
 # 2 Charlie  charlie@email.com     88
-
+```
 
 ### `handle_outliers(df: pd.DataFrame, threshold: float = 1.5) -> pd.DataFrame`
 **Purpose:**  
@@ -708,7 +708,7 @@ print(clean_df)
 # 2  35   95.0
 # 3  40   78.0
 # 4 NaN   NaN
-
+```
 
 ### `split_multi_response(df: pd.DataFrame, column_name: str, delimiter: str = ",") -> pd.DataFrame`
 **Purpose:**  
@@ -794,5 +794,5 @@ report_path = generate_data_profile(df, report_file="outputs/data_profile_report
 print(f"Report generated at: {report_path}")
 # Example output:
 # Report generated at: outputs/data_profile_report.txt
-
+```
 
