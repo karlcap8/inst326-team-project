@@ -29,3 +29,54 @@ print(ds)
 print("Columns:", ds.columns)
 print("Issues:", len(issues))
 print("Snapshot:", ds.snapshot())
+
+
+
+
+#Sukhman Class demo
+
+import pandas as pd
+from src.data_pipeline import DataPipeline  # adjust import if needed
+
+# -- Sample Data --
+
+# First dataset: some messy text, missing values
+df1 = pd.DataFrame({
+    "Name": [" Alice ", "Bob ", "  Carol"],
+    "Age": [25, None, 29],
+    "Department": ["Research ", " Dev", " Research"]
+})
+
+# Second dataset: another batch to merge
+df2 = pd.DataFrame({
+    "Name": ["Dave", "Eve"],
+    "Age": [31, 27],
+    "Department": ["Dev", "Research"]
+})
+
+# -- Create and Run the Pipeline --
+
+pipeline = DataPipeline(df1, name="employee_batch_1")
+
+# Step 1: Strip whitespace from all string columns
+pipeline.strip_text()
+
+# Step 2: Fill missing numeric values (using mean strategy)
+pipeline.fill_missing(strategy="mean")
+
+# Step 3: Merge with a second dataset
+pipeline.merge([df2], how="outer")
+
+# Step 4: Generate a data report (saved to file)
+report_path = pipeline.generate_report("output/employee_report.txt")
+
+# -- Print Results --
+
+print(pipeline)
+print("Name:", pipeline.name)
+print("Shape:", pipeline.shape)
+print("History:", pipeline.history)
+print("Cleaned?:", pipeline.is_cleaned)
+print("Snapshot preview:\n", pipeline.snapshot().head())
+print("Report saved to:", report_path)
+
