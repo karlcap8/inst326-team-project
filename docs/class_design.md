@@ -55,3 +55,65 @@ issues = ds.validate({
 })
 
 print(ds)
+```
+
+
+### DataPipeline Class
+
+**Purpose:**
+The `DataPipeline` class provides a modular framework for managing and transforming research datasets throughout the cleaning and preparation stages. It encapsulates common preprocessing tasks—such as whitespace removal, missing value imputation, dataset merging, and data reporting—into an object-oriented structure. This design enables researchers to run sequential data operations while maintaining a clear record of each transformation step, ensuring reproducibility and consistency across datasets.
+
+**Key Attributes:**
+- `_df (pd.DataFrame)`: Stores the working dataset.
+- `_name (str)`: Name or identifier for the pipeline instance.
+- `_history (list[str])`: Keeps a log of all operations performed on the dataset.
+- `_is_cleaned (bool)`: Tracks whether cleaning steps have been applied.
+- `_last_report_path (str)`: Stores the most recent generated report’s file path.
+
+**Key Methods:**
+- `strip_text()` – Removes extra whitespace from all string columns using `strip_whitespace()`.
+- `fill_missing(strategy="median")` – Fills missing numeric values based on a defined strategy using `fill_missing_values()`.
+- `merge(datasets, how="outer")` – Combines multiple DataFrames into one unified dataset with `merge_datasets()`.
+- `generate_report(filename)` – Creates a detailed text-based report summarizing dataset statistics via `generate_data_report()`.
+- `snapshot()` – Returns a short preview of the cleaned dataset for quick inspection.
+
+**Encapsulation & Access Control:**
+Core attributes are private (prefixed with `_`) to prevent accidental modification and ensure data integrity. Read-only access is provided through properties such as `name`, `shape`, `history`, and `is_cleaned`. This design enforces encapsulation while maintaining transparency in data transformations.
+
+**Integration with Project 1:**
+The `DataPipeline` class integrates four key functions from Project 1:
+- `strip_whitespace()`
+- `fill_missing_values()`
+- `merge_datasets()`
+- `generate_data_report()`
+By embedding these functions as methods, the class demonstrates the transition from procedural programming to object-oriented design, promoting modularity, reusability, and cleaner code organization.
+
+**Example Usage:**
+```python
+import pandas as pd
+from src.data_pipeline import DataPipeline
+
+df1 = pd.DataFrame({
+    "Name": [" Alice ", "Bob ", "  Carol"],
+    "Age": [25, None, 29],
+    "Department": ["Research ", " Dev", " Research"]
+})
+
+df2 = pd.DataFrame({
+    "Name": ["Dave", "Eve"],
+    "Age": [31, 27],
+    "Department": ["Dev", "Research"]
+})
+
+pipeline = DataPipeline(df1, name="employee_batch_1")
+
+pipeline.strip_text()
+pipeline.fill_missing(strategy="mean")
+pipeline.merge([df2], how="outer")
+report_path = pipeline.generate_report("output/employee_report.txt")
+
+print(pipeline)
+print("Shape:", pipeline.shape)
+print("History:", pipeline.history)
+print("Snapshot:\n", pipeline.snapshot().head())
+```
