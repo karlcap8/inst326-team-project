@@ -1,6 +1,14 @@
 import pandas as pd
 import re
 
+# Reuse your Project 1 functions (already in src/research_data_lib.py)
+from src.research_data_lib import (
+    validate_email,
+    filter_rows_by_condition,
+    count_unique_values,
+    pivot_and_aggregate,
+)
+
 class DataAnalysis:
     """Encapsulates various data analysis operations such as email validation, filtering, counting unique values, and pivoting.
 
