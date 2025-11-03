@@ -134,3 +134,30 @@ print(analysis.history)
 
 print("\nCleaned Status:")
 print(analysis.is_cleaned)
+
+# profiler demo
+# examples/profiler_demo.py
+
+import pandas as pd
+from src.data_profiler import DataProfiler
+
+df = pd.DataFrame({
+    "comment": ["Great!", "So-so...", "Bad :("],
+    "score": [10, 999, 5],
+    "hobbies": ["reading, music", "music, sports", None],
+})
+
+profiler = DataProfiler(df, name="pilot", report_dir="reports")
+
+print("Before:", profiler.shape, profiler.columns)
+
+profiler.clean_text()
+profiler.fix_outliers(threshold=1.5)
+profiler.split_multi("hobbies", delimiter=",")
+
+print("After:", profiler.shape, profiler.columns)
+
+report_path = profiler.profile()  # writes text report + charts (png files)
+print("Report written to:", report_path)
+print(profiler)
+
