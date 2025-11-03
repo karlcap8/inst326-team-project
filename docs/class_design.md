@@ -119,107 +119,125 @@ print("Snapshot:\n", pipeline.snapshot().head())
 ```
 
 
-DataAnalysis Class
-Purpose:
 
-The DataAnalysis class encapsulates a set of analytical operations for datasets, including validation, filtering, counting unique values, and pivoting. It is designed to provide a modular, object-oriented framework for performing exploratory data analysis and other common tasks. By organizing these functions as methods inside a class, it ensures better reusability and maintains a clear, intuitive interface for data analysis.
+# DataAnalysis Class Design Document
 
-Key Attributes:
+## Purpose:
+The `DataAnalysis` class encapsulates a set of analytical operations for datasets, including validation, filtering, counting unique values, and pivoting. It is designed to provide a modular, object-oriented framework for performing exploratory data analysis and other common tasks. By organizing these functions as methods inside a class, it ensures better reusability and maintains a clear, intuitive interface for data analysis.
 
-_df (pd.DataFrame): The primary dataset to be analyzed, stored as a Pandas DataFrame.
+## Key Attributes:
 
-_name (str): The name or identifier of the analysis instance.
+- **`_df`** (`pd.DataFrame`): The primary dataset to be analyzed, stored as a Pandas DataFrame.
+- **`_name`** (`str`): The name or identifier of the analysis instance.
+- **`_history`** (`list[str]`): A log of all operations performed on the dataset, enabling reproducibility.
+- **`_is_cleaned`** (`bool`): Tracks whether any cleaning or preprocessing steps have been applied to the data.
 
-_history (list[str]): A log of all operations performed on the dataset, enabling reproducibility.
+## Key Methods:
 
-_is_cleaned (bool): Tracks whether any cleaning or preprocessing steps have been applied to the data.
+### 1. `validate_email(email: str) -> bool`
+   - **Purpose**: Validates an email address using a regular expression.
+   - **Parameters**: 
+     - `email` (`str`): The email address to validate.
+   - **Returns**: `True` if the email is valid, otherwise `False`.
+   - **Usage**: Validates whether a given email is in a proper format (e.g., `test@example.com`).
 
-Key Methods:
+### 2. `filter_rows_by_condition(condition_func) -> pd.DataFrame`
+   - **Purpose**: Filters the rows in the dataset based on a custom condition function.
+   - **Parameters**: 
+     - `condition_func` (`function`): A function that takes a row (as a Pandas Series) and returns a boolean value, dictating whether the row should be included.
+   - **Returns**: A filtered DataFrame with rows that meet the condition.
+   - **Usage**: Filters rows based on a dynamic condition, e.g., filtering by age, income, etc.
 
-validate_email(email: str) -> bool
+### 3. `count_unique_values() -> dict`
+   - **Purpose**: Counts the number of unique values for each column in the dataset.
+   - **Returns**: A dictionary with the column names as keys and the number of unique values as values.
+   - **Usage**: Provides a quick summary of how diverse the data is across columns.
 
-Purpose: Validates an email address using a regular expression.
+### 4. `pivot_and_aggregate(pivot_column: str, value_column: str, agg_func: str = 'sum') -> pd.DataFrame`
+   - **Purpose**: Pivots the dataset on a specified column and aggregates the data using a chosen aggregation function.
+   - **Parameters**: 
+     - `pivot_column` (`str`): The column to pivot on.
+     - `value_column` (`str`): The column to apply aggregation on.
+     - `agg_func` (`str`): The aggregation function to use (e.g., `sum`, `mean`, `count`).
+   - **Returns**: A pivoted DataFrame with the aggregated values.
+   - **Usage**: Useful for summarizing data by categories (e.g., summing sales by region).
 
-Parameters:
+### 5. `__str__() -> str`
+   - **Purpose**: String representation of the `DataAnalysis` object.
+   - **Returns**: A human-readable description of the object, including the number of rows, columns, and cleaned status.
 
-email (str): The email address to validate.
+### 6. `__repr__() -> str`
+   - **Purpose**: Developer-friendly string representation for the `DataAnalysis` object.
+   - **Returns**: A technical string representation (e.g., showing the shape of the DataFrame and cleaned status).
 
-Returns: True if the email is valid, otherwise False.
+### 7. `snapshot() -> pd.DataFrame`
+   - **Purpose**: Returns a preview (head) of the dataset after analysis steps.
+   - **Returns**: The first few rows of the DataFrame, providing a snapshot of the data at its current state.
 
-Usage: Validates whether a given email is in a proper format (e.g., test@example.com).
+## Encapsulation & Access Control:
+- All attributes are private (prefixed with `_`) to prevent direct modification from outside the class.
+- **Properties**: Read-only access to attributes like `_name`, `_df`, and `_history` is provided through controlled getter methods, ensuring that users cannot modify internal data directly.
+- **Encapsulation**: This design ensures the data is handled properly, and only allowed methods can alter the dataset, preserving its integrity.
 
-filter_rows_by_condition(condition_func) -> pd.DataFrame
-
-Purpose: Filters the rows in the dataset based on a custom condition function.
-
-Parameters:
-
-condition_func (function): A function that takes a row (as a Pandas Series) and returns a boolean value, dictating whether the row should be included.
-
-Returns: A filtered DataFrame with rows that meet the condition.
-
-Usage: Filters rows based on a dynamic condition, e.g., filtering by age, income, etc.
-
-count_unique_values() -> dict
-
-Purpose: Counts the number of unique values for each column in the dataset.
-
-Returns: A dictionary with the column names as keys and the number of unique values as values.
-
-Usage: Provides a quick summary of how diverse the data is across columns.
-
-pivot_and_aggregate(pivot_column: str, value_column: str, agg_func: str = 'sum') -> pd.DataFrame
-
-Purpose: Pivots the dataset on a specified column and aggregates the data using a chosen aggregation function.
-
-Parameters:
-
-pivot_column (str): The column to pivot on.
-
-value_column (str): The column to apply aggregation on.
-
-agg_func (str): The aggregation function to use (e.g., sum, mean, count).
-
-Returns: A pivoted DataFrame with the aggregated values.
-
-Usage: Useful for summarizing data by categories (e.g., summing sales by region).
-
-str() -> str
-
-Purpose: String representation of the DataAnalysis object.
-
-Returns: A human-readable description of the object, including the number of rows, columns, and cleaned status.
-
-repr() -> str
-
-Purpose: Developer-friendly string representation for the DataAnalysis object.
-
-Returns: A technical string representation (e.g., showing the shape of the DataFrame and cleaned status).
-
-snapshot() -> pd.DataFrame
-
-Purpose: Returns a preview (head) of the dataset after analysis steps.
-
-Returns: The first few rows of the DataFrame, providing a snapshot of the data at its current state.
-
-Encapsulation & Access Control:
-
-All attributes are private (prefixed with _) to prevent direct modification from outside the class.
-
-Properties: Read-only access to attributes like _name, _df, and _history is provided through controlled getter methods, ensuring that users cannot modify internal data directly.
-
-Encapsulation: This design ensures the data is handled properly, and only allowed methods can alter the dataset, preserving its integrity.
-
-Integration with Project 1:
-
-The DataAnalysis class directly integrates core functions from Project 1:
-
-validate_email: Validates email addresses.
-
-filter_rows_by_condition: Filters rows based on a custom condition.
-
-count_unique_values: Counts unique values across the dataset.
-
-pivot_and_aggregate: Pivots and aggregates data by a specified column.
+## Integration with Project 1:
+The `DataAnalysis` class directly integrates core functions from Project 1:
+- `validate_email`: Validates email addresses.
+- `filter_rows_by_condition`: Filters rows based on a custom condition.
+- `count_unique_values`: Counts unique values across the dataset.
+- `pivot_and_aggregate`: Pivots and aggregates data by a specified column.
 
 These functions are encapsulated within methods that operate on the dataset in a modular and reusable manner. This shifts the functions from a procedural to an object-oriented approach.
+
+## Example Usage:
+
+```python
+import pandas as pd
+from src.data_analysis import DataAnalysis  # Adjust the import if necessary
+
+# Sample DataFrame: Employee data with age and email
+df = pd.DataFrame({
+    'age': [25, 30, 35, 40, 22],
+    'email': ['test@example.com', 'invalid-email', 'user@example.com', 'another@example.com', 'valid@domain.com']
+})
+
+# Initialize the DataAnalysis class with the sample DataFrame
+analysis = DataAnalysis(df)
+
+# 1. Validate Email Addresses
+print("Email Validation:")
+emails_to_check = [
+    "test@example.com",
+    "invalid-email",
+    "user@example.com",
+    "another@example.com",
+    "valid@domain.com"
+]
+for email in emails_to_check:
+    print(f"{email}: {analysis.validate_email(email)}")
+
+# 2. Filter Rows by Condition (e.g., Age > 30)
+print("\nFiltered Rows (Age > 30):")
+filtered_df = analysis.filter_rows_by_condition(lambda row: row['age'] > 30)
+print(filtered_df)
+
+# 3. Count Unique Values in Columns
+print("\nCount of Unique Values in Columns:")
+unique_counts = analysis.count_unique_values()
+print(unique_counts)
+
+# 4. Pivot and Aggregate Data (e.g., Summing Age per Email)
+print("\nPivot and Aggregate Data (Summing Ages per Email):")
+pivot_df = analysis.pivot_and_aggregate('email', 'age', agg_func='sum')
+print(pivot_df)
+
+# 5. Show String Representations
+print("\nString Representations:")
+print(str(analysis))  # __str__ method
+print(repr(analysis))  # __repr__ method
+
+# 6. Access History and Cleaned Status
+print("\nOperation History:")
+print(analysis.history)
+
+print("\nCleaned Status:")
+print(analysis.is_cleaned)
