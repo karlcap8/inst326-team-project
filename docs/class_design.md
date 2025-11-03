@@ -241,3 +241,43 @@ print(analysis.history)
 
 print("\nCleaned Status:")
 print(analysis.is_cleaned)
+```
+
+### DataProfiler Class
+
+**Purpose**  
+`DataProfiler` encapsulates pandas-based data preparation and profiling. It wraps Project 1 functions into a cohesive object that can clean text, fix outliers, split multi-response columns, and generate a profiling report with charts. This class complements `Dataset`, `DataPipeline`, and `DataAnalysis` by focusing on preprocessing and report generation.
+
+**Key Attributes**
+- `_df` (`pd.DataFrame`): Working copy of the dataset.
+- `_name` (`str`): Profile/dataset name.
+- `_report_dir` (`str`): Output directory for the report and charts.
+- `_last_report_path` (`Optional[str]`): Path of the most recently generated report.
+
+**Key Methods (P1 Integration)**
+- `clean_text()` → `remove_punctuation(df)`
+- `fix_outliers(threshold)` → `handle_outliers(df, threshold)`
+- `split_multi(column_name, delimiter)` → `split_multi_response(df, column_name, delimiter)`
+- `profile(filename)` → `generate_data_profile(df, report_file)`
+
+**Encapsulation & Access Control**  
+All attributes are private. Read-only access via properties: `shape`, `columns`, `last_report_path`, `df` (returns a defensive copy). This prevents accidental external mutation.
+
+**Example Usage**
+```python
+import pandas as pd
+from src.data_profiler import DataProfiler
+
+df = pd.DataFrame({
+    "comment": ["Great!", "So-so...", "Bad :("],
+    "score": [10, 999, 5],
+    "hobbies": ["reading, music", "music, sports", None],
+})
+
+profiler = DataProfiler(df, name="pilot", report_dir="reports")
+profiler.clean_text()
+profiler.fix_outliers(threshold=1.5)
+profiler.split_multi("hobbies")
+report_path = profiler.profile()
+print(report_path)
+
