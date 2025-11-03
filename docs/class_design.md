@@ -117,3 +117,109 @@ print("Shape:", pipeline.shape)
 print("History:", pipeline.history)
 print("Snapshot:\n", pipeline.snapshot().head())
 ```
+
+
+DataAnalysis Class
+Purpose:
+
+The DataAnalysis class encapsulates a set of analytical operations for datasets, including validation, filtering, counting unique values, and pivoting. It is designed to provide a modular, object-oriented framework for performing exploratory data analysis and other common tasks. By organizing these functions as methods inside a class, it ensures better reusability and maintains a clear, intuitive interface for data analysis.
+
+Key Attributes:
+
+_df (pd.DataFrame): The primary dataset to be analyzed, stored as a Pandas DataFrame.
+
+_name (str): The name or identifier of the analysis instance.
+
+_history (list[str]): A log of all operations performed on the dataset, enabling reproducibility.
+
+_is_cleaned (bool): Tracks whether any cleaning or preprocessing steps have been applied to the data.
+
+Key Methods:
+
+validate_email(email: str) -> bool
+
+Purpose: Validates an email address using a regular expression.
+
+Parameters:
+
+email (str): The email address to validate.
+
+Returns: True if the email is valid, otherwise False.
+
+Usage: Validates whether a given email is in a proper format (e.g., test@example.com).
+
+filter_rows_by_condition(condition_func) -> pd.DataFrame
+
+Purpose: Filters the rows in the dataset based on a custom condition function.
+
+Parameters:
+
+condition_func (function): A function that takes a row (as a Pandas Series) and returns a boolean value, dictating whether the row should be included.
+
+Returns: A filtered DataFrame with rows that meet the condition.
+
+Usage: Filters rows based on a dynamic condition, e.g., filtering by age, income, etc.
+
+count_unique_values() -> dict
+
+Purpose: Counts the number of unique values for each column in the dataset.
+
+Returns: A dictionary with the column names as keys and the number of unique values as values.
+
+Usage: Provides a quick summary of how diverse the data is across columns.
+
+pivot_and_aggregate(pivot_column: str, value_column: str, agg_func: str = 'sum') -> pd.DataFrame
+
+Purpose: Pivots the dataset on a specified column and aggregates the data using a chosen aggregation function.
+
+Parameters:
+
+pivot_column (str): The column to pivot on.
+
+value_column (str): The column to apply aggregation on.
+
+agg_func (str): The aggregation function to use (e.g., sum, mean, count).
+
+Returns: A pivoted DataFrame with the aggregated values.
+
+Usage: Useful for summarizing data by categories (e.g., summing sales by region).
+
+str() -> str
+
+Purpose: String representation of the DataAnalysis object.
+
+Returns: A human-readable description of the object, including the number of rows, columns, and cleaned status.
+
+repr() -> str
+
+Purpose: Developer-friendly string representation for the DataAnalysis object.
+
+Returns: A technical string representation (e.g., showing the shape of the DataFrame and cleaned status).
+
+snapshot() -> pd.DataFrame
+
+Purpose: Returns a preview (head) of the dataset after analysis steps.
+
+Returns: The first few rows of the DataFrame, providing a snapshot of the data at its current state.
+
+Encapsulation & Access Control:
+
+All attributes are private (prefixed with _) to prevent direct modification from outside the class.
+
+Properties: Read-only access to attributes like _name, _df, and _history is provided through controlled getter methods, ensuring that users cannot modify internal data directly.
+
+Encapsulation: This design ensures the data is handled properly, and only allowed methods can alter the dataset, preserving its integrity.
+
+Integration with Project 1:
+
+The DataAnalysis class directly integrates core functions from Project 1:
+
+validate_email: Validates email addresses.
+
+filter_rows_by_condition: Filters rows based on a custom condition.
+
+count_unique_values: Counts unique values across the dataset.
+
+pivot_and_aggregate: Pivots and aggregates data by a specified column.
+
+These functions are encapsulated within methods that operate on the dataset in a modular and reusable manner. This shifts the functions from a procedural to an object-oriented approach.
