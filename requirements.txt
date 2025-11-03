@@ -1,1 +1,78 @@
+# Research Data Pipeline - Python Dependencies
+# ==========================================================
+#
+# This file lists the Python packages required to run the
+# Research Data Pipeline Function Library and its OOP extensions.
+#
+# Course: INST326 - Object-Oriented Programming for Information Science
+# Projects: Function Library Development (Project 1) & OOP Conversion (Project 2)
+#
+# ==========================================================
+# REQUIRED DEPENDENCIES
+# ==========================================================
+#
+# These packages are used throughout the project for data cleaning,
+# type casting, visualization, and validation.
+#
+# External Libraries:
+pandas>=1.3.0       # Data handling and analysis
+numpy>=1.20.0       # Numerical data operations
+matplotlib>=3.3.0   # Data visualization and plotting
+#
+# Standard Library Modules (no installation required):
+# - re               (regular expressions for header normalization)
+# - datetime         (date parsing and formatting)
+# - typing           (type hints and annotations)
+# - string           (text pattern utilities)
+# - os               (file and path operations)
+# - collections.Counter (frequency analysis)
+# - copy             (deep copying for data safety)
+
+# ==========================================================
+# PYTHON VERSION
+# ==========================================================
+python>=3.8
+
+# ==========================================================
+# OPTIONAL DEVELOPMENT DEPENDENCIES
+# ==========================================================
+#
+# Uncomment these if you plan to extend or test your codebase.
+
+# Testing frameworks
+# pytest>=6.0.0
+# pytest-cov>=2.10.0
+
+# Code formatting and linting
+# black>=21.0.0
+# flake8>=3.8.0
+# mypy>=0.800
+
+# Documentation
+# sphinx>=3.0.0
+# sphinx-rtd-theme>=0.5.0
+
+# ==========================================================
+# INSTALLATION INSTRUCTIONS
+# ==========================================================
+#
+# 1. Ensure Python 3.8+ is installed:
+#    python --version
+#
+# 2. Install required libraries:
+#    pip install -r requirements.txt
+#
+# 3. Run the demo:
+#    python examples/demo_script.py
+#
+# ==========================================================
+# NOTES
+# ==========================================================
+#
+# - Standard library modules (e.g., re, datetime, string, os)
+#   do not need to be installed manually.
+# - Pandas and NumPy are required for core data handling.
+# - Matplotlib is used for simple visualizations and reporting.
+# - This file ensures consistent environments across all team members.
+# ==========================================================
 
