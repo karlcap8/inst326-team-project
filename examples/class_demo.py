@@ -80,3 +80,57 @@ print("Cleaned?:", pipeline.is_cleaned)
 print("Snapshot preview:\n", pipeline.snapshot().head())
 print("Report saved to:", report_path)
 
+
+
+#Harrang class demo
+
+import pandas as pd
+from src.data_analysis import DataAnalysis 
+
+# Sample DataFrame: Employee data with age and email
+df = pd.DataFrame({
+    'age': [25, 30, 35, 40, 22],
+    'email': ['test@example.com', 'invalid-email', 'user@example.com', 'another@example.com', 'valid@domain.com']
+})
+
+# Initialize DataAnalysis class with the sample DataFrame
+analysis = DataAnalysis(df)
+
+# -- 1. Validate Email --
+print("Email Validation:")
+emails_to_check = [
+    "test@example.com",
+    "invalid-email",
+    "user@example.com",
+    "another@example.com",
+    "valid@domain.com"
+]
+for email in emails_to_check:
+    print(f"{email}: {analysis.validate_email(email)}")
+
+# -- 2. Filter Rows by Condition (Age > 30) --
+print("\nFiltered Rows (Age > 30):")
+filtered_df = analysis.filter_rows_by_condition(lambda row: row['age'] > 30)
+print(filtered_df)
+
+# -- 3. Count Unique Values --
+print("\nCount of Unique Values in Columns:")
+unique_counts = analysis.count_unique_values()
+print(unique_counts)
+
+# -- 4. Pivot and Aggregate Data (Summing Ages per Email) --
+print("\nPivot and Aggregate Data (Summing Ages per Email):")
+pivot_df = analysis.pivot_and_aggregate('email', 'age', agg_func='sum')
+print(pivot_df)
+
+# -- 5. Show String Representations --
+print("\nString Representations:")
+print(str(analysis))  # __str__ method
+print(repr(analysis))  # __repr__ method
+
+# -- 6. Access History and Cleaned Status --
+print("\nOperation History:")
+print(analysis.history)
+
+print("\nCleaned Status:")
+print(analysis.is_cleaned)
