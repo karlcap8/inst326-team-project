@@ -1,7 +1,18 @@
-#Karl add HeaderNormalizer here i believe
+#Karl 
+from base_classes import Transformer
+from research_data_lib import normalize_header
 
+class HeaderNormalizer(Transformer):
+    def __init__(self):
+        super().__init__("HeaderNormalizer")
 
+    @property
+    def required_columns(self): return []
 
+    def _apply(self, df):
+        new_cols = {c: normalize_header(c) for c in df.columns}
+        return df.rename(columns=new_cols)
+    
 #Harrang:
 from research_data_lib import cast_row_types
 
