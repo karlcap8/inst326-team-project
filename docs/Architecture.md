@@ -17,47 +17,48 @@ As requested, the structure and explanations parallel that example.
 ├───────────────────────────────────────────────────────────────────────────┤
 
  ┌───────────────────────────────────────────────────────────────┐
- │                        Transformer (ABC)                       │
+ │                        Transformer (ABC)                      │
  ├───────────────────────────────────────────────────────────────┤
- │ + name : str                                                   │
- │ + notes : str                                                  │
- │ + created_at : datetime                                        │
- │ + _history : list[str]                                         │
+ │ + name : str                                                  │
+ │ + notes : str                                                 │
+ │ + created_at : datetime                                       │
+ │ + _history : list[str]                                        │
  │                                                               │
- │ @property                                                      │
- │ + required_columns : list[str]   (ABSTRACT)                    │
+ │ @property                                                     │
+ │ + required_columns : list[str]   (ABSTRACT)                   │
  │                                                               │
- │ @abstractmethod                                                │
- │ + _apply(df) → DataFrame                                       │
+ │ @abstractmethod                                               │
+ │ + _apply(df) → DataFrame                                      │
  │                                                               │
- │ + apply(df) → DataFrame  (TEMPLATE METHOD)                     │
+ │ + apply(df) → DataFrame  (TEMPLATE METHOD)                    │
  │ + _preflight(df)                                              │
  │ + _log(message)                                               │
  │ + history() → list[str]                                       │
  └───────────────────────────────────────────────────────────────┘
+└───────────────────────────────────────────────────────────────────────────┘
                              ▲
                              │ inherits
                              │
 
-┌───────────────────────────────────────────────────────────────────────────┐
-│                    CONCRETE IMPLEMENTATION LAYER                          │
-│                 (Inheritance & Polymorphism for Cleaning)                 │
-├───────────────────────────────────────────────────────────────────────────┤
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                                 CONCRETE IMPLEMENTATION LAYER                          │
+│                              (Inheritance & Polymorphism for Cleaning)                 │
+├────────────────────────────────────────────────────────────────────────────────────────┤
 
-┌─────────────────────────┐   ┌─────────────────────────┐   ┌──────────────────────────────┐
-│    HeaderNormalizer     │   │       PIIRemover        │   │         TypeCaster           │
-├─────────────────────────┤   ├─────────────────────────┤   ├──────────────────────────────┤
-│ + required_columns = [] │   │ + columns : list[str]   │   │ + type_map : dict             │
-│ + _apply(df)            │   │ + required_columns = [] │   │ + required_columns = []       │
-│   → cleans headers      │   │ + _apply(df)            │   │ + _apply(df)                  │
-└─────────────────────────┘   │   → drops PII columns   │   │   → converts column types     │
-                              └─────────────────────────┘   └──────────────────────────────┘
+┌─────────────────────────┐   ┌─────────────────────────┐   ┌─────────────────────────────┐
+│    HeaderNormalizer     │   │       PIIRemover        │   │         TypeCaster          │
+├─────────────────────────┤   ├─────────────────────────┤   ├─────────────────────────────┤
+│ + required_columns = [] │   │ + columns : list[str]   │   │ + type_map : dict           │
+│ + _apply(df)            │   │ + required_columns = [] │   │ + required_columns = []     │
+│   → cleans headers      │   │ + _apply(df)            │   │ + _apply(df)                │
+└─────────────────────────┘   │   → drops PII columns   │   │   → converts column types   │
+                              └─────────────────────────┘   └─────────────────────────────┘
 
 
-└───────────────────────────────────────────────────────────────────────────┘
-│
-│ used by
-▼
+└────────────────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ used by
+                                      ▼
 
 ┌───────────────────────────────────────────────────────────────────────────┐
 │                           COMPOSITION LAYER                               │
@@ -69,11 +70,11 @@ As requested, the structure and explanations parallel that example.
   │                             Pipeline                              │
   ├───────────────────────────────────────────────────────────────────┤
   │ + steps : list[Transformer]   ◄──────────── HAS-MANY steps        │
-  │ + history : list[str]                                            │
+  │ + history : list[str]                                             │
   │                                                                   │
-  │ + run(df)                                                        │
-  │      → runs each Transformer polymorphically                     │
-  │      → collects each step’s log history                          │
+  │ + run(df)                                                         │
+  │      → runs each Transformer polymorphically                      │
+  │      → collects each step’s log history                           │
   └───────────────────────────────────────────────────────────────────┘
 
                              │
