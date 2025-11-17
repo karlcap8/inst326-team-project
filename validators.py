@@ -3,7 +3,7 @@
  from research_data_lib import validate_dataset
 
  @dataclass
- class ValidationIssue:
+class ValidationIssue:
  	row_idx: int
  	column: str
  	rule: str
@@ -11,7 +11,7 @@
  	message: str
 
  @dataclass
- class ValidationReport:
+class ValidationReport:
  	issues: List[ValidationIssue]
  	@property
  	def is_valid(self): return not self.issues
@@ -22,7 +22,7 @@
              lines.append(f"|{i.row_idx}|{i.column}|{i.rule}|{i.value}|{i.message}|")
      	return "\n".join(lines)
 
- class RulesValidator:
+class RulesValidator:
  	def check(self, df, rules: Dict) -> ValidationReport:
      	rows = df.to_dict(orient="records")
      	raw = validate_dataset(rows, rules)
