@@ -1,8 +1,7 @@
-
 ```markdown
-# 📊 Research Data Cleaning & Validation Pipeline  
-### *INST326 — Object-Oriented Programming for Information Science*  
-### *Project 3 — Inheritance, Polymorphism, and Composition*
+# Research Data Cleaning & Validation Pipeline  
+### INST326 — Object-Oriented Programming for Information Science  
+### Project 3 — Inheritance, Polymorphism, and Composition
 
 **Team:** Harrang Khalsa, Karl Capili, Sukhman Singh  
 **Section:** (Your Section)  
@@ -10,36 +9,34 @@
 
 ---
 
-# ⭐ Overview
+# Overview
 
-This project implements a **survey data cleaning and validation pipeline** using advanced object-oriented programming concepts:
+This project implements a survey data cleaning and validation pipeline using advanced object-oriented programming concepts:
 
-- **Inheritance** through an abstract `Transformer` base class  
-- **Polymorphism** through interchangeable cleaning steps  
-- **Composition** via a `Pipeline` that orchestrates multiple Transformers  
-- **Design patterns** including Template Method and Strategy  
+- Inheritance via an abstract `Transformer` base class  
+- Polymorphism through interchangeable data-cleaning steps  
+- Composition in a `Pipeline` that executes multiple Transformers in sequence  
+- Design patterns including the Template Method and Strategy patterns  
 
-The system transforms raw survey exports (e.g., from Qualtrics) into **clean, validated, analysis-ready datasets**.
+The system transforms raw survey exports (e.g., from Qualtrics or Google Forms) into clean, validated, analysis-ready datasets.
 
 ---
 
-# 🧠 System Architecture
+# System Architecture
 
-## 🔷 Inheritance Hierarchy
+## Inheritance Hierarchy
 
 ### Transformer Hierarchy
-
 ```
 
 Transformer (ABC)
-├── HeaderNormalizer     # standardizes column names
-├── PIIRemover           # removes personally identifiable information
-└── TypeCaster           # converts column types (int, float, bool)
+├── HeaderNormalizer
+├── PIIRemover
+└── TypeCaster
 
 ```
 
 ### Validator Hierarchy
-
 ```
 
 RulesValidator
@@ -48,63 +45,62 @@ RulesValidator
 
 ```
 
----
-
-## 🔷 Composition Relationships
+## Composition Relationships
 
 ```
 
 Pipeline
-├── has-many Transformer objects (in sequence)
+├── has-many Transformer objects
 └── produces a cleaned DataFrame + step history log
 
 RulesValidator
-└── produces ValidationReport
-└── contains multiple ValidationIssue objects
+└── produces a ValidationReport
+└── which contains multiple ValidationIssue objects
 
 ````
 
 ---
 
-# 🔧 Core Components
+# Core Components
 
-## 🧩 1. Transformer (Abstract Base Class)
+## 1. Transformer (Abstract Base Class)
 
-Defines the **interface contract** for all cleaning steps.
+Defines the shared interface and behavior for all cleaning steps.
 
-**Key abstract requirements:**
-- `required_columns` (property)
-- `_apply(df)` (transformation logic)
+**Abstract requirements:**
+- `_apply(df)` – subclass-specific transformation logic  
+- `required_columns` – columns required for the step to run  
 
-**Concrete shared logic includes:**
-- `apply()` → Template Method:
+**Concrete shared logic:**
+- `apply()` – template method that:
   - Performs preflight validation  
-  - Calls the subclass’s `_apply()`  
+  - Calls the subclass `_apply`  
   - Logs step history  
 
-This ensures every transformer behaves uniformly.
+This ensures uniform behavior across all cleaning classes.
 
 ---
 
-## 🧩 2. Concrete Transformers
+## 2. Concrete Transformers
 
-### **HeaderNormalizer**
-- Converts messy headers (e.g., `"Q1 - Age"`) into `snake_case` (→ `q1_age`).
+### HeaderNormalizer
+Normalizes messy column headers (e.g., `"Q1 - Age"` → `q1_age`).
 
-### **PIIRemover**
-- Removes PII columns such as emails, phone numbers, and names.
+### PIIRemover
+Removes personally identifiable information (email, phone, names).
 
-### **TypeCaster**
-- Converts columns to specified types:
-  - `"19"` → `19`
-  - `"Yes"`/`"no"` → `True`/`False`
+### TypeCaster
+Converts survey values to the appropriate data types:
+- `"19"` → `19`
+- `"Yes"` → `True`
 
 ---
 
-## 🧩 3. Pipeline (Composition)
+## 3. Pipeline (Composition)
 
-The `Pipeline` executes a sequence of `Transformer` steps **polymorphically**:
+The `Pipeline` composes multiple Transformers and executes them in sequence.
 
+Example:
 ```python
 steps = [
     HeaderNormalizer(),
@@ -115,34 +111,34 @@ pipe = Pipeline(steps)
 cleaned = pipe.run(df)
 ````
 
-Pipeline does **not** know which type of Transformer it is running.
-It simply calls the same `apply()` method on each.
-This is pure polymorphism.
+The Pipeline does not need to know the type of each step.
+It simply calls `apply()` on all of them.
+This is polymorphism.
 
 ---
 
-## 🧩 4. Validators
+## 4. Validators
 
-### **RulesValidator**
+### RulesValidator
 
-Runs validation rules such as:
+Runs rule-based validation such as:
 
 * Required fields
-* Ranges (e.g., age 0–120)
-* Type checks
-* Allowed categorical responses
+* Value ranges
+* Data-type enforcement
+* Allowed categories
 
-### **ValidationReport**
+### ValidationReport
 
-Contains all validation results and provides:
+Stores all issues and provides:
 
-* `.is_valid` boolean
-* `.to_markdown()` formatted output
+* `is_valid` boolean
+* `to_markdown()` formatted output
 * A list of `ValidationIssue` objects
 
 ---
 
-# 🎨 Class Hierarchy Diagram
+# Class Diagram
 
 ```mermaid
 classDiagram
@@ -186,36 +182,29 @@ classDiagram
 
 ---
 
-# 🔁 Polymorphism Examples
+# Polymorphism Examples
 
-### Example: Calling `apply()` on different Transformer types
+### Example: Pipeline calling `apply()` without knowing the subclass type
 
 ```python
 for step in steps:
     df = step.apply(df)
 ```
 
-Even though:
+Behavior differs per subclass, but the interface stays the same.
 
-* `HeaderNormalizer` renames columns
-* `PIIRemover` drops columns
-* `TypeCaster` casts values
+Benefits:
 
-…the Pipeline treats them **the same** because they implement the same interface.
+* Steps are interchangeable
+* New Transformers can be added freely
+* No type-checking or conditional logic
+* Pipeline stays simple
 
-### Benefits:
-
-* Steps can be added or reordered without any changes to Pipeline
-* New Transformers can be introduced easily
-* Pipeline does not need any type checks
-
-This demonstrates the **Strategy Pattern**.
+This follows the **Strategy Pattern**.
 
 ---
 
-# 🧪 Usage Examples
-
-## Clean and Validate a Dataset
+# Usage Example
 
 ```python
 import pandas as pd
@@ -244,6 +233,7 @@ rules = {
 }
 
 report = RulesValidator().check(cleaned, rules)
+
 print(cleaned)
 print(report.to_markdown())
 ```
@@ -259,35 +249,31 @@ All checks passed 🎉
 
 ---
 
-# 🧪 Running the Demo
+# Running the Demo
 
-From the repository root:
-
-```bash
+```
 python demo.py
 ```
 
 ---
 
-# 🧪 Running the Tests
+# Running Tests
 
-Run the full test suite:
-
-```bash
+```
 python -m unittest test_survey_system -v
 ```
 
 Tests verify:
 
-* Inheritance and abstract method enforcement
-* Polymorphism via Pipeline
-* Composition relationships
-* Transformer functionality
-* Validation logic
+* Inheritance
+* Abstract method enforcement
+* Polymorphism in Pipeline
+* Behavior of each Transformer
+* Validation logic and reporting
 
 ---
 
-# 📁 File Structure
+# File Structure
 
 ```
 inst326-team-project/
@@ -307,47 +293,47 @@ inst326-team-project/
 
 ---
 
-# 🧱 Requirement Checklist (For Graders)
+# Requirement Checklist
 
-### ✔ Inheritance
+### Inheritance
 
-* Abstract `Transformer` with concrete subclasses
+* Abstract base class
+* Concrete subclasses
 * Proper `super()` usage
 
-### ✔ Polymorphism
+### Polymorphism
 
 * Pipeline executes all Transformers via shared interface
 
-### ✔ Composition
+### Composition
 
-* Pipeline *has-many* Transformer objects
-* Validator *has* a ValidationReport
+* Pipeline has multiple Transformer objects
+* RulesValidator produces a ValidationReport
 
-### ✔ Design Patterns
+### Design Patterns
 
-* Template Method (`apply()` → `_apply()`)
-* Strategy (interchangeable Transformers)
+* Template Method
+* Strategy Pattern
 
-### ✔ Testing
+### Testing
 
-* 5 behavioral + structural tests included
+* All tests included in `test_survey_system.py`
 
-### ✔ Documentation
+### Documentation
 
 * Updated README
-* Architecture explanation in `/docs/Architecture.md`
+* Architecture document in `/docs/Architecture.md`
 
 ---
 
-# 🧑‍💻 Team Information
+# Team Information
 
-* **Harrang Khalsa**
-* **Karl Capili**
-* **Sukhman Singh**
+* Harrang Khalsa
+* Karl Capili (performed Pipeline, Validator, and integration work due to team member departure)
+* Sukhman Singh
 
----
+```
 
 
-
-Your README.md is now fully formatted and ready to paste directly into GitHub.
+This version is **100% Markdown-safe**, **no chat formatting**, and **ready to paste directly** into your README.md file.
 ```
