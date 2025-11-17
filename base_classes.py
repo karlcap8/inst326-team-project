@@ -1,7 +1,7 @@
-
 from abc import ABC, abstractmethod
-from datetime import datetime, timedelta
-from typing import Any, Iterable
+from datetime import datetime
+from typing import Any
+
 
 class Transformer(ABC):
     """Abstract base class for one survey-data cleaning step.
@@ -15,97 +15,74 @@ class Transformer(ABC):
     a Pipeline can invoke them polymorphically in a fixed order.
     """
 
-    def __init__(self, param1: str, param2: str):
-        """Initialize shared attributes.
+    def __init__(self, name: str, notes: str = "") -> None:
+        """Initialize shared attributes for all transformers.
 
         Args:
-            param1: Step name (e.g., 'HeaderNormalizer', 'PIIRemover').
-            param2: Step notes/version (e.g., 'v1.0' or a short description).
+            name: Short name of the step (e.g., 'HeaderNormalizer').
+            notes: Optional description or version info.
         """
-        self.param1 = param1              # step name
-        self.param2 = param2              # notes/version
-        self.created_at = datetime.now()  # common metadata for logging
-        self._history: list[str] = []     # shared history/log messages
+        self.name = name
+        self.notes = notes
+        self.created_at = datetime.now()
+        self._history: list[str] = []
 
-    # === ABSTRACT METHODS (must be implemented) ===
+    # === ABSTRACT INTERFACE (must be implemented by subclasses) ===
 
     @abstractmethod
-    def required_behavior1(self, dataset: Any) -> Any:
-        """Apply this transformation to the dataset and return the result.
+    def _apply(self, df) -> Any:
+        """Subclass-specific transformation logic.
 
-        WHY ABSTRACT: Each cleaning step uses a different algorithm
-        (normalize headers vs. drop PII vs. cast types vs. impute missing),
-        so behavior varies by subclass.
-
-        TEAM CONTRACT: The Pipeline will call `required_behavior1(dataset)`
-        on every Transformer in order, without caring about the concrete type.
-
-        Returns:
-            The transformed dataset (same type as input).
+        Each concrete transformer must implement this method.
+        It should accept a pandas DataFrame (or DataFrame-like) and
+        return a transformed DataFrame.
         """
-        pass
-
-    @abstractmethod
-    def required_behavior2(self) -> str:
-        """Human-readable description of what this step does.
-
-        WHY ABSTRACT: Each subclass should describe its own action and parameters
-        (e.g., which columns it touches, strategy used) for audit/reporting.
-
-        Returns:
-            A concise, single-line description of the step.
-        """
-        pass
-
-    # === ABSTRACT PROPERTIES (required data) ===
+        raise NotImplementedError
 
     @property
     @abstractmethod
-    def required_data(self) -> Iterable[str]:
-        """Columns this step *requires* to exist before running.
+    def required_columns(self) -> list[str]:
+        """Columns that must exist before this step can run.
 
-        WHY PROPERTY: The pipeline can preflight-check the dataset schema before
-        executing steps and provide helpful errors if inputs are missing.
-
-        Can be implemented as:
-        - Stored attribute (e.g., a set of column names)
-        - Computed value (depends on constructor args)
-        - Fixed constant (for universal requirements)
-
-        Returns:
-            Iterable[str]: Column names required by this step.
+        Subclasses return a list of column names they depend on.
+        Return an empty list if the step can run on any schema.
         """
-        pass
+        raise NotImplementedError
 
-    # === CONCRETE METHODS (shared functionality) ===
+    # === CONCRETE TEMPLATE METHOD (shared across all subclasses) ===
 
-    def shared_calculation(self) -> str:
-        """Build a standardized log line for this step.
+    def apply(self, df):
+        """Run this step: preflight checks, transform, and log.
 
-        WHY CONCRETE: All subclasses benefit from consistent logging/reporting.
-
-        Uses abstract methods/properties: required_behavior2(), required_data
-
-        Returns:
-            A string like: "[12:03:11] HeaderNormalizer (needs: id,email)"
+        This is the method that Pipeline calls. It is the same for
+        all subclasses and delegates the actual work to `_apply`.
         """
+        self._preflight(df)
+        out = self._apply(df)
+        self._log(f"{self.name} finished")
+        return out
+
+    # === SHARED HELPERS (concrete) ===
+
+    def _preflight(self, df) -> None:
+        """Check that required columns exist in the incoming DataFrame."""
+        # Make sure df has a .columns attribute
+        if not hasattr(df, "columns"):
+            raise TypeError(
+                f"{self.name}: expected a DataFrame-like object with `.columns`"
+            )
+
+        if self.required_columns:
+            missing = [c for c in self.required_columns if c not in df.columns]
+            if missing:
+                raise KeyError(f"{self.name}: missing required columns: {missing}")
+
+    def _log(self, message: str) -> None:
+        """Record a log message for this step."""
         stamp = datetime.now().strftime("%H:%M:%S")
-        desc = self.required_behavior2()
-        needs = ", ".join(self.required_data) if self.required_data else "none"
-        line = f"[{stamp}] {self.param1} — {desc} (needs: {needs})"
+        line = f"[{stamp}] {self.name}: {message}"
         self._history.append(line)
-        return line
 
-    def another_shared_method(self, param: Any) -> Any:
-        """Attach an audit note to this step and return it (passthrough).
-
-        Args:
-            param: Any note/metadata (e.g., {'affected_rows': 42})
-
-        Returns:
-            The same param, after recording it in the history for traceability.
-        """
-        stamp = datetime.now().isoformat(timespec="seconds")
-        self._history.append(f"{stamp} | note={param!r}")
-        return param
-
+    def history(self) -> list[str]:
+        """Return a copy of the internal history log."""
+        return list(self._history)
