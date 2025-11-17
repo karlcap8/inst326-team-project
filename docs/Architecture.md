@@ -3,9 +3,7 @@
 ## **System Architecture Document**
 
 This Architecture document explains the inheritance hierarchy, polymorphism decisions, design patterns, and composition structures used in our **Survey Data Cleaning & Validation Pipeline**.  
-It is modeled after the “Garden Management System – Architecture Diagram” example provided by our instructor.  
-As requested, the structure and explanations parallel that example.  
-(Reference: :contentReference[oaicite:0]{index=0})
+
 
 ---
 
