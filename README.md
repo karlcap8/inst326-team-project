@@ -20,6 +20,29 @@ This project implements a survey data cleaning and validation pipeline using adv
 The system transforms raw survey exports (e.g., from Qualtrics or Google Forms) into clean, validated, analysis-ready datasets.
 
 ---
+## 🧭 Domain: Survey Data Cleaning & Validation
+
+Our project focuses on the **Survey Data Cleaning & Validation** domain, specializing in transforming raw survey exports (e.g., Qualtrics, Google Forms) into clean, standardized, and validated datasets suitable for research analysis.
+
+Survey datasets often contain:
+- Messy or inconsistent column names (e.g., “Q1 - Age”)
+- Mixed data types (“19” as a string, “Yes/No” as text)
+- Personally identifiable information (PII)
+- Missing or invalid responses
+- Columns with inconsistent formatting across survey waves
+
+Our pipeline addresses these issues through:
+- **Header standardization** (to consistent `snake_case`)
+- **Removal of sensitive PII fields**
+- **Type casting** (e.g., string → int/bool)
+- **Structured validation rules** to enforce:
+  - Required fields  
+  - Type correctness  
+  - Range checks  
+  - Logical constraints  
+
+This domain mirrors real-world research workflows in academic labs, UX teams, and social science datasets.
+---
 
 # System Architecture
 
@@ -269,6 +292,63 @@ Tests verify:
 * Polymorphism in Pipeline
 * Behavior of each Transformer
 * Validation logic and reporting
+
+---
+## 🧩 Design Decisions
+
+Our design is centered around clear separation of concerns, extensibility, and the use of object-oriented design principles.
+
+### 1. Use of an Abstract Base Class (ABC)
+We created a `Transformer` abstract class to define the required interface for all cleaning steps:
+- Every transformer must implement `_apply(self, df)`
+- Every transformer declares `required_columns`
+- Shared behavior (`apply`, `_preflight`, `_log`, `history`) lives in the ABC
+
+**Why?**  
+This enforces consistency and allows the Pipeline to treat all cleaning steps uniformly, enabling polymorphism.
+
+---
+
+### 2. Polymorphism via the Pipeline
+The `Pipeline` executes a list of Transformers without caring about their concrete types.  
+This is classic **Strategy pattern** behavior.
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/karlcap8/inst326-team-project
+cd inst326-team-project
+```
+### 2. Install dependencies
+Dependencies are listed in requirements.txt.
+
+Install them with:
+
+```bash
+pip install -r requirements.txt
+```
+### 3. Verify installation
+Run the unit tests:
+
+```bash
+python -m unittest test_survey_system -v
+```
+Run the demo script:
+
+```bash
+python demo.py
+```
+If both commands run without errors, the project is correctly installed.
+
+### Requirements
+- Python 3.10+
+- pandas
+- numpy
+
+All dependencies are included in the repository’s requirements.txt.
 
 ---
 
