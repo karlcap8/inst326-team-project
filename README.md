@@ -1,4 +1,3 @@
-```markdown
 # Research Data Cleaning & Validation Pipeline  
 ### INST326 — Object-Oriented Programming for Information Science  
 ### Project 3 — Inheritance, Polymorphism, and Composition
@@ -332,8 +331,3 @@ inst326-team-project/
 * Karl Capili (performed Pipeline, Validator, and integration work due to team member departure)
 * Sukhman Singh
 
-```
-
-
-This version is **100% Markdown-safe**, **no chat formatting**, and **ready to paste directly** into your README.md file.
-```
