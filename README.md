@@ -1,8 +1,3 @@
-Absolutely — here is the **Markdown-formatted, copy-and-paste-ready** README.md exactly as you requested.
-
-You can paste this directly into **README.md** in your GitHub repo.
-
----
 
 ```markdown
 # 📊 Research Data Cleaning & Validation Pipeline  
