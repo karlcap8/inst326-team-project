@@ -3,8 +3,8 @@
 ### Project 3 — Inheritance, Polymorphism, and Composition
 
 **Team:** Harrang Khalsa, Karl Capili, Sukhman Singh  
-**Section:** (Your Section)  
-**Completion Date:** (Add your date)
+**Section:** 0301
+**Completion Date:** November 23, 2025
 
 ---
 
