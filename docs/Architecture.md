@@ -1,5 +1,4 @@
 
-```markdown
 # 🏗️ Research Data Cleaning & Validation Pipeline  
 ## **System Architecture Document**
 
@@ -7,7 +6,7 @@ This Architecture document explains the inheritance hierarchy, polymorphism deci
 It is modeled after the “Garden Management System – Architecture Diagram” example provided by our instructor.  
 As requested, the structure and explanations parallel that example.  
 (Reference: :contentReference[oaicite:0]{index=0})
-```
+
 ---
 
 # 📐 Complete System Architecture
