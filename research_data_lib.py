@@ -1,4 +1,7 @@
 import re
+import numpy as np
+import pandas as pd
+from pandas import DataFrame
 
 # Simple 1 - Karl
 def normalize_header(name: str) -> str:
