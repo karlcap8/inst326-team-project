@@ -1,11 +1,11 @@
-# src/dataset.py
+# dataset.py
 
 from __future__ import annotations
 from typing import List, Dict, Optional, Set
 from copy import deepcopy
 
-# Reuse your Project 1 functions (already in src/research_data_lib.py)
-from src.research_data_lib import (
+# Reuse Project 1 functions 
+from research_data_lib import (
     normalize_header,
     rename_columns,
     cast_row_types,
@@ -216,8 +216,8 @@ from typing import List, Optional
 from copy import deepcopy
 import pandas as pd
 
-# Reuse your Project 1 functions
-from src.research_data_lib import (
+# Reuse Project 1 functions
+from research_data_lib import (
     strip_whitespace,
     merge_datasets,
     fill_missing_values,
