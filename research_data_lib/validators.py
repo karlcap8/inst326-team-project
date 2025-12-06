@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Dict
-from research_data_lib import validate_dataset
+from .research_data_lib import validate_dataset
+
 
 @dataclass
 class ValidationIssue:

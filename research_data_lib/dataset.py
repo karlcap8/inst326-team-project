@@ -5,12 +5,13 @@ from typing import List, Dict, Optional, Set
 from copy import deepcopy
 
 # Reuse Project 1 functions 
-from research_data_lib import (
+from .research_data_lib import (
     normalize_header,
     rename_columns,
     cast_row_types,
     validate_dataset,
 )
+
 
 
 class Dataset:

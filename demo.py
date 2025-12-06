@@ -1,7 +1,8 @@
 import pandas as pd
-from transformers import HeaderNormalizer, PIIRemover, TypeCaster
-from validators import RulesValidator
-from pipeline import Pipeline
+from research_data_lib.transformers import HeaderNormalizer, PIIRemover, TypeCaster
+from research_data_lib.validators import RulesValidator
+from research_data_lib.pipeline import Pipeline
+
 
 def main():
     df = pd.DataFrame({

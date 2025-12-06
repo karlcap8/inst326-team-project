@@ -1,10 +1,10 @@
 # Research Data Cleaning & Validation Pipeline  
 ### INST326 — Object-Oriented Programming for Information Science  
-### Project 3 — Inheritance, Polymorphism, and Composition
+### Project 4
 
 **Team:** Harrang Khalsa, Karl Capili, Sukhman Singh  
 **Section:** 0301
-**Completion Date:** November 23, 2025
+**Date:** December 14, 2025
 
 ---
 
@@ -32,16 +32,25 @@ Survey datasets often contain:
 - Columns with inconsistent formatting across survey waves
 
 Our pipeline addresses these issues through:
-- **Header standardization** (to consistent `snake_case`)
-- **Removal of sensitive PII fields**
-- **Type casting** (e.g., string → int/bool)
-- **Structured validation rules** to enforce:
-  - Required fields  
-  - Type correctness  
-  - Range checks  
-  - Logical constraints  
+This project implements a complete, modular Research Survey Data Pipeline that:
+
+Cleans survey data through a configurable pipeline of transformers
+
+Removes or anonymizes PII
+
+Casts values into consistent data types
+
+Validates cleaned data using rule-based checks
+
+Saves the cleaned dataset, validation report, and a JSON state file
+
+Provides a complete command-line interface for real end-to-end usage
+
+Includes full unit, integration, and system test coverage
 
 This domain mirrors real-world research workflows in academic labs, UX teams, and social science datasets.
+
+This work extends Project 3 by adding a formal Python package (research_data_lib), a persistence layer, and the full CLI tool (app.py).
 ---
 
 # System Architecture
@@ -352,22 +361,122 @@ All dependencies are included in the repository’s requirements.txt.
 
 ---
 
+```markdown
+## ▶️ Basic Usage Guide With Examples
+
+### 1. Prepare a CSV file
+Place your raw survey CSV in a directory such as:
+
+```
+
+data/sample_survey.csv
+
+````
+
+### 2. Run the app on a dataset
+
+```bash
+py -3 app.py data/sample_survey.csv --output-dir outputs --state-file state/state.json
+````
+
+This will generate:
+
+* `outputs/cleaned_survey.csv`
+* `outputs/validation_report.md`
+* `state/state.json`
+
+### 3. Run the app without saving state
+
+```bash
+py -3 app.py data/sample_survey.csv --no-state
+```
+
+### 4. Output example (terminal)
+
+```
+[INFO] Loaded raw CSV with shape: (3, 6)
+[INFO] Pipeline finished. Cleaned shape: (3, 4)
+[INFO] Cleaned dataset saved to: outputs/cleaned_survey.csv
+[INFO] Validation report saved to: outputs/validation_report.md
+[INFO] State saved to: state/state.json
+```
+
+---
+
+## 🧪 Running Tests
+
+### Run all tests (Project 3 + Project 4)
+
+```bash
+py -3 -m unittest
+```
+
+### Run a specific test file
+
+```bash
+py -3 -m unittest test_io_and_state.py
+```
+
+### Included test suites
+
+| Test File                 | Description                                     |
+| ------------------------- | ----------------------------------------------- |
+| `test_survey_system.py`   | Baseline tests from Project 3                   |
+| `test_io_and_state.py`    | Unit tests for I/O + state saving               |
+| `test_integration.py`     | Tests pipeline + validator + I/O together       |
+| `test_system_workflow.py` | System tests using full `run_workflow` function |
+
+All tests currently pass.
+
+# 🔧 Configuration
+
+DEFAULT_PII_COLUMNS, DEFAULT_TYPE_MAP, and DEFAULT_VALIDATION_RULES appear in app.py.
+
+These should be customized based on your survey schema.
+
+Example:
+```
+DEFAULT_PII_COLUMNS = ["name", "email", "phone"]
+
+DEFAULT_TYPE_MAP = {
+    "age": "int",
+    "consent": "bool",
+}
+
+DEFAULT_VALIDATION_RULES = {
+    "age": {"type": "int", "min": 0, "max": 120, "required": True},
+    "consent": {"type": "bool", "required": True},
+}
+```
+
 # File Structure
 
 ```
 inst326-team-project/
-├── base_classes.py
-├── transformers.py
-├── validators.py
-├── pipeline.py
-├── demo.py
-├── test_survey_system.py
-├── research_data_lib.py
-├── dataset.py
-├── docs/
-│   ├── Architecture.md
-│   └── (other docs)
-└── README.md
+│
+├── app.py                           # Main CLI application (Project 4)
+├── requirements.txt                 # Python dependencies
+├── README.md                        # Project documentation
+│
+├── research_data_lib/               # Project 4 Python package
+│   ├── __init__.py
+│   ├── base_classes.py              # Abstract base classes for pipeline steps
+│   ├── dataset.py                   # Dataset helpers (legacy from Project 3)
+│   ├── pipeline.py                  # Pipeline class (step composition)
+│   ├── research_data_lib.py         # Core functions from Project 1 (normalize, cast, etc.)
+│   ├── transformers.py              # HeaderNormalizer, PIIRemover, TypeCaster
+│   ├── validators.py                # RulesValidator + ValidationReport
+│   └── io_utils.py                  # CSV loading, saving, and JSON state persistence
+│
+├── test_survey_system.py            # Original Project 3 tests
+├── test_io_and_state.py             # Unit tests for I/O + state (Project 4)
+├── test_integration.py              # Integration tests (pipeline + validator + I/O)
+├── test_system_workflow.py          # System tests (full workflow via run_workflow)
+│
+├── outputs/                         # Example output directory (auto-created)
+├── state/                           # Example state directory (auto-created)
+└── data/                            # Sample datasets (optional)
+
 ```
 
 ---
@@ -407,7 +516,10 @@ inst326-team-project/
 
 # Team Information
 
-* Harrang Khalsa
-* Karl Capili (performed Pipeline, Validator, and integration work due to team member departure)
-* Sukhman Singh
+| Team Member     | Contributions                                                                                         |
+| --------------- | ----------------------------------------------------------------------------------------------------- |
+| **Karl Capili** | Pipeline development, I/O utilities, app CLI implementation, architecture documentation, system tests |
+| **Harrang**     | Transformer implementations, rule validation logic, integration tests, test design, debugging         |
+| **Sukhman**     | Dataset helpers, unit testing, documentation, code review, presentation                               |
+| **ALL**         | Had an even distribution of technical and documentation work contributions throughout this project    |
 

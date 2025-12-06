@@ -1,7 +1,8 @@
 #Karl 
 import pandas as pd
-from base_classes import Transformer
-from research_data_lib import normalize_header, cast_row_types
+from .base_classes import Transformer
+from .research_data_lib import normalize_header, cast_row_types
+
 
 class HeaderNormalizer(Transformer):
     def __init__(self):

@@ -1,9 +1,10 @@
 import unittest
 import pandas as pd
 
-from transformers import HeaderNormalizer, PIIRemover, TypeCaster
-from pipeline import Pipeline
-from validators import RulesValidator, ValidationReport
+from research_data_lib.transformers import HeaderNormalizer, PIIRemover, TypeCaster
+from research_data_lib.pipeline import Pipeline
+from research_data_lib.validators import RulesValidator, ValidationReport
+
 
 
 class TestHeaderNormalizer(unittest.TestCase):

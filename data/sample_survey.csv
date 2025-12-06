@@ -1,0 +1,4 @@
+Name,Email,Phone,Age,Consent,Favorite_Color
+Alice,alice@example.com,555-1111,21,Yes,Blue
+Bob,bob@example.com,555-2222,19,No,Green
+Charlie,charlie@example.com,555-3333,22,Yes,Red
