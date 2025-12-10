@@ -5,6 +5,7 @@
 **Team:** Harrang Khalsa, Karl Capili, Sukhman Singh  
 **Section:** 0301
 **Date:** December 14, 2025
+**Video Presentation Link:** https://drive.google.com/file/d/1CiS73ZGS9PSQ6WQos8D_KT_5sw6jBrWP/view?usp=sharing
 
 ---
 
